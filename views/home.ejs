@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: https:;">
+
+    <title>TechSymposium '26 | Home</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="background-color: #0f0c29; color: white;">
+
+    <nav class="navbar navbar-expand-lg fixed-top glass-nav py-2">
+        <div class="container-fluid px-3 d-flex align-items-center">
+            
+            <a class="navbar-brand fw-bold text-white fs-4" href="#">
+                <i class="fas fa-atom text-info me-2"></i> TECHSYM '26
+            </a>
+            
+            <a href="/logout" onclick="logout()" class="d-lg-none btn btn-outline-danger px-3 rounded-pill fw-bold ms-auto">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#hero">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#events">Events</a></li>
+                    
+                    <li class="nav-item ms-lg-3 my-2 my-lg-0 d-none d-lg-block">
+                        <a href="/logout" onclick="logout()" class="btn btn-sm btn-outline-danger px-3 rounded-pill fw-bold">
+                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                        </a>
+                    </li>
+
+                    <li class="nav-item my-2 my-lg-0">
+                        <% if (typeof registered !== 'undefined' && registered) { %>
+                             <a id="nav-cta-btn" class="btn btn-success ms-lg-3 fw-bold" href="/confirmation">
+                                <i class="fas fa-check-circle me-2"></i>Ticket
+                            </a>
+                        <% } else { %>
+                            <a id="nav-cta-btn" class="btn btn-glow ms-lg-3" href="/register">Register</a>
+                        <% } %>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header id="hero" class="hero-section text-center text-white">
+        <div class="container-fluid px-3">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <h5 class="text-uppercase text-info letter-spacing-1 mb-3">Department of IT Presents</h5>
+                    <h1 class="glitch-text mb-4">SYMPOSIUM 2026</h1>
+                    <p class="lead mb-5 text-white-50">Join the ultimate convergence of code, creativity, and innovation.</p>
+                    
+                    <div class="d-flex flex-column-reverse flex-sm-row justify-content-center align-items-center gap-3">
+                        <a href="#about" class="btn btn-outline-light rounded-pill px-4 py-2">Learn More</a>
+                        
+                        <% if (typeof registered !== 'undefined' && registered) { %>
+                            <a id="hero-cta-btn" href="/confirmation" class="btn btn-success btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>View Ticket
+                            </a>
+                        <% } else { %>
+                            <a id="hero-cta-btn" href="/register" class="btn btn-glow">Register Now</a>
+                        <% } %>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="about" class="about-section py-5 position-relative">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <div class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill fw-bold">Dec 26, 2025</div>
+                    <h2 class="display-5 fw-bold mb-4">Where Innovation <br> Meets <span class="text-info">Intelligence</span></h2>
+                    <p class="text-white-50 lead mb-4">
+                        TechSymposium '25 is a national-level technical fest. Compete with the best minds and win cash prizes worth <strong>₹50,000</strong>.
+                    </p>
+                    <div class="row g-4 mt-2">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-square bg-dark border border-secondary rounded-3 p-3 me-3">
+                                    <i class="fas fa-trophy text-warning fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-white">Cash Prizes</h6>
+                                    <small class="text-white-50">Win Big Rewards</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-square bg-dark border border-secondary rounded-3 p-3 me-3">
+                                    <i class="fas fa-certificate text-info fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-white">Certificates</h6>
+                                    <small class="text-white-50">For all Participants</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                  <img src="/images/about.jpeg" alt="Abouting" class="img-fluid rounded-4 shadow-lg border border-secondary" onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400?text=TechSymposium'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="events" class="event-section py-5">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold display-5">Our Events</h2>
+                <div class="divider bg-info mx-auto mb-3" style="width: 60px; height: 3px;"></div>
+                <p class="text-white-50">Technical & Non-Technical Challenges</p>
+            </div>
+
+            <h3 class="text-info mb-4"><i class="fas fa-microchip me-2"></i> Technical Events</h3>
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-laptop-code fa-3x card-icon text-primary"></i>
+                        <h4>Blind Coding</h4>
+                        <p class="text-white-50 small">Type code with your monitor turned off.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-bug fa-3x card-icon text-danger"></i>
+                        <h4>Bug Smasher</h4>
+                        <p class="text-white-50 small">Find and fix bugs in code snippets.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-file-powerpoint fa-3x card-icon text-success"></i>
+                        <h4>Paper Presentation</h4>
+                        <p class="text-white-50 small">Showcase your research on emerging technologies.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-warning mb-4"><i class="fas fa-gamepad me-2"></i> Non-Technical Events</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-gamepad fa-3x card-icon text-warning"></i>
+                        <h4>Gaming</h4>
+                        <p class="text-white-50 small">Valorant and BGMI tournaments.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-map-marked-alt fa-3x card-icon text-warning"></i>
+                        <h4>Treasure Hunt</h4>
+                        <p class="text-white-50 small">Solve riddles and find hidden QR codes.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-camera fa-3x card-icon text-warning"></i>
+                        <h4>Photography</h4>
+                        <p class="text-white-50 small">Capture the best moments of the event.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <% if (typeof registered !== 'undefined' && registered) { %>
+                      <a id="bottom-cta-btn" 
+                         href="/confirmation"
+                         class="btn btn-success px-5 py-3 fs-5">
+                        <i class="fas fa-check-circle me-2"></i>View Ticket
+                    </a>
+                <% } else { %>
+                    <a id="bottom-cta-btn" href="/register" class="btn btn-glow px-5 py-3 fs-5">Join The Event</a>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center py-4" style="background: #050508; color: #888;">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Department of Information Technology. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script> 
+        try {
+            AOS.init(); 
+        } catch(e) {
+            console.warn("AOS Animation failed to load");
+        }
+    </script>
+
+    <script>
+        function logout() {
+            localStorage.removeItem('sympo_event_id');
+        }
+    </script>
+</body>
+</html>
