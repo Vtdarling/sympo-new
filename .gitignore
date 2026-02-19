@@ -1,0 +1,12 @@
+# Environment variables (contains secrets - never commit)
+.env
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime
+.DS_Store

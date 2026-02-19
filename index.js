@@ -237,12 +237,19 @@ async function registerFailedLogin(user) {
     await user.save();
 }
 
+// Generates a cryptographically secure numeric OTP of the given digit length.
+// Uses crypto.randomInt() (OS-level CSPRNG) so the result is unpredictable and
+// safe for use as a one-time password or account-recovery code.
+// Example: generateNumericCode(6) → "482917" (always exactly 6 digits)
 function generateNumericCode(length = 6) {
-    const min = 10 ** (length - 1);
-    const max = (10 ** length) - 1;
-    return String(Math.floor(min + Math.random() * (max - min + 1)));
+    const min = 10 ** (length - 1);       // e.g. 100000 for length=6
+    const max = (10 ** length) - 1;       // e.g. 999999 for length=6
+    return String(crypto.randomInt(min, max + 1)); // inclusive of both bounds
 }
 
+// Hashes a plain-text code with SHA-256 before storing it in the session/DB.
+// The raw OTP is never persisted — only its hash is kept, so a session leak
+// cannot expose the actual code.
 function hashCode(code) {
     return crypto.createHash('sha256').update(code).digest('hex');
 }
@@ -300,14 +307,21 @@ app.post(
             userByEmail.lockUntil = null;
             await userByEmail.save();
 
+            // Step 1 – generate a fresh 6-digit OTP using a CSPRNG.
             const otpCode = generateNumericCode(6);
+
+            // Step 2 – store only the SHA-256 hash of the OTP in the session
+            // (never the plain-text code), along with a 5-minute expiry and an
+            // attempt counter to prevent brute-force guessing.
             req.session.pendingMfa = {
                 userId: String(userByEmail._id),
-                otpHash: hashCode(otpCode),
-                expiresAt: Date.now() + (5 * 60 * 1000),
-                attempts: 0
+                otpHash: hashCode(otpCode),          // hashed — safe to keep in session
+                expiresAt: Date.now() + (5 * 60 * 1000), // expires in 5 minutes
+                attempts: 0                          // max 5 attempts allowed
             };
 
+            // Step 3 – send the plain-text OTP to the user's registered email.
+            // The code is only ever transmitted via email; it is never sent to the browser.
             await sendMail(
                 userByEmail.email,
                 "Your TechSymposium Login OTP",
@@ -399,17 +413,20 @@ app.post('/mfa',
                 return res.render('mfa', { error: 'Invalid OTP format.', csrfToken: getCsrfToken(req) });
             }
 
+            // Enforce a 5-minute expiry on the OTP.
             if (pendingMfa.expiresAt < Date.now()) {
                 delete req.session.pendingMfa;
                 return res.redirect('/?error=OTP expired. Please login again.');
             }
 
+            // Limit to 5 attempts to prevent brute-force guessing of the 6-digit code.
             pendingMfa.attempts = (pendingMfa.attempts || 0) + 1;
             if (pendingMfa.attempts > 5) {
                 delete req.session.pendingMfa;
                 return res.redirect('/?error=Too many OTP attempts. Please login again.');
             }
 
+            // Hash the submitted code and compare against the stored hash.
             if (hashCode(req.body.otp) !== pendingMfa.otpHash) {
                 req.session.pendingMfa = pendingMfa;
                 return res.render('mfa', { error: 'Incorrect OTP.', csrfToken: getCsrfToken(req) });
@@ -468,9 +485,11 @@ app.post('/recover/request',
                 });
             }
 
+            // Generate a fresh 6-digit recovery code with a CSPRNG, hash it for
+            // safe storage, and set a 10-minute expiry in the database.
             const recoveryCode = generateNumericCode(6);
-            user.recoveryCodeHash = hashCode(recoveryCode);
-            user.recoveryCodeExpires = new Date(Date.now() + (10 * 60 * 1000));
+            user.recoveryCodeHash = hashCode(recoveryCode); // only the hash is stored
+            user.recoveryCodeExpires = new Date(Date.now() + (10 * 60 * 1000)); // 10-min window
             await user.save();
 
             await sendMail(
