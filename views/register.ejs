@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:;">
     <title>Event Registration | TechSymposium '26</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/vendor/animate/animate.min.css"/>
     <link rel="stylesheet" href="/css/style.css">
-    <style>
+    <style nonce="<%= cspNonce %>">
         .btn-bright { background: linear-gradient(45deg, #FF512F 0%, #DD2476 100%); border: none; color: white; box-shadow: 0 4px 15px rgba(221, 36, 118, 0.5); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
         .btn-bright:hover { background: linear-gradient(45deg, #DD2476 0%, #FF512F 100%); transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(221, 36, 118, 0.7); color: white; }
         .error-message { color: #ff6b6b; font-size: 0.85em; margin-top: 5px; display: none; text-align: left; padding-left: 5px; animation: fadeIn 0.3s; }
@@ -18,11 +17,28 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         /* Readonly input style */
         .glass-input[readonly] { background: rgba(255, 255, 255, 0.05) !important; color: #aaa !important; cursor: not-allowed; }
+        .register-shell { z-index: 2; }
+        .qr-image { width: 180px; height: 180px; }
+        .privacy-box {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .text-purple-elegant {
+            color: #ffffff !important;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+        }
+        .register-page .text-white-50 { color: rgba(255, 255, 255, 0.82) !important; }
+        .register-page .form-floating label { color: rgba(255, 255, 255, 0.9) !important; }
+        .register-page .event-tile { color: rgba(255, 255, 255, 0.9); }
+        .register-page .event-tile span { font-weight: 500; }
+        .register-page .form-check-label { color: rgba(255, 255, 255, 0.88) !important; }
     </style>
 </head>
 <body class="register-page">
     <div class="circles"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-    <div class="container py-5 position-relative" style="z-index: 2;">
+    <div class="container py-5 position-relative register-shell">
         <div class="row justify-content-center">
             <div class="col-lg-8 col-md-10">
                 <div class="animate__animated animate__fadeInDown">
@@ -31,7 +47,7 @@
                 <div class="card glass-card border-0 shadow-lg animate__animated animate__fadeInUp">
                     <div class="card-header bg-transparent text-center border-0 pt-4 pb-0">
                         <div class="icon-box mb-3 mx-auto"><i class="fas fa-rocket fa-2x text-white"></i></div>
-                        <h2 class="fw-bold text-white mb-1">Complete Registration</h2>
+                        <h2 class="fw-bold text-purple-elegant mb-1">Complete Registration</h2>
                         <p class="text-white-50">Select your events and confirm payment</p>
                     </div>
                     <div class="card-body p-4 p-md-5">
@@ -42,10 +58,10 @@
                             </div>
                         <% } %>
 
-                        <form action="/register" method="POST" id="registerForm" onsubmit="return validateRegistration()">
+                        <form action="/register" method="POST" id="registerForm">
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-                            <h6 class="text-uppercase text-white-50 mb-3 fw-bold fs-7">Personal Details (Pre-filled)</h6>
+                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Personal Details (Pre-filled)</h6>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-12">
                                     <div class="form-floating">
@@ -62,7 +78,7 @@
                                 </div>
                             </div>
                             
-                            <h6 class="text-uppercase text-white-50 mb-3 fw-bold fs-7">Contact Info (Pre-filled)</h6>
+                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Contact Info (Pre-filled)</h6>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <div class="form-floating">
@@ -80,7 +96,7 @@
                                 </div>
                             </div>
                             
-                            <h6 class="text-uppercase text-white-50 mb-3 fw-bold fs-7">Select One Technical Event</h6>
+                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Select One Technical Event</h6>
                             <div class="event-grid mb-4">
                                 <input type="radio" class="btn-check" name="technical_event" id="tech1" value="Blind Coding" required>
                                 <label class="event-tile" for="tech1"><i class="fas fa-code mb-2"></i><span>Blind Coding</span></label>
@@ -95,7 +111,7 @@
                                 <label class="event-tile" for="tech4"><i class="fas fa-laptop-code mb-2"></i><span>Web Design</span></label>
                             </div>
                             
-                            <h6 class="text-uppercase text-white-50 mb-3 fw-bold fs-7">Select One Non-Technical Event</h6>
+                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Select One Non-Technical Event</h6>
                             <div class="event-grid mb-5">
                                 <input type="radio" class="btn-check" name="non_technical_event" id="nontech1" value="Gaming" required>
                                 <label class="event-tile" for="nontech1"><i class="fas fa-gamepad mb-2"></i><span>Gaming</span></label>
@@ -107,19 +123,28 @@
                                 <label class="event-tile" for="nontech3"><i class="fas fa-camera mb-2"></i><span>Photography</span></label>
                             </div>
                             
-                            <h6 class="text-uppercase text-white-50 mb-3 fw-bold fs-7">Payment Details</h6>
+                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Payment Details</h6>
                             <div class="card bg-dark bg-opacity-25 border-secondary mb-4">
                                 <div class="card-body text-center">
-                                    <p class="text-white small mb-3">Scan the QR code using GPay / PhonePe / Paytm</p>
-                                    <div class="bg-white p-2 d-inline-block rounded mb-3">
-                                        <img src="/images/qr.jpg" alt="UPI QR Code" class="img-fluid" style="width: 180px; height: 180px;" onerror="this.onerror=null; this.src='https://via.placeholder.com/180x180?text=QR+Code';">
-                                    </div>
-                                    <p class="text-white-50 small mb-3">UPI ID: student_sympo@oksbi</p>
+                                    <p class="text-white small mb-3">Pay using GPay / PhonePe / Paytm with the details below</p>
+                                    <p class="text-white mb-1"><strong>UPI Number:</strong> 8825676740</p>
+                                    <p class="text-white-50 small mb-3"><strong>UPI ID:</strong> 8825676740@cnrb</p>
                                     
                                     <div class="form-floating text-start">
                                         <input type="text" name="transaction_id" class="form-control glass-input" id="floatingTransaction" placeholder="Transaction ID" maxlength="12" required>
                                         <label for="floatingTransaction">Enter UPI Transaction ID (12 Digits)</label>
                                     </div>
+                                    <p class="text-white-50 small mt-2 mb-0">Note: Transaction ID will be verified.</p>
+                                </div>
+                            </div>
+
+                            <div class="privacy-box mb-4">
+                                <p class="text-white-50 small mb-2">Privacy notice: Registration data is used for event operations, fraud checks, and participant verification. Payment references are stored in privacy-preserving form.</p>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="yes" id="privacyNoticeAck" name="privacy_notice_ack" required>
+                                    <label class="form-check-label text-white-50 small" for="privacyNoticeAck">
+                                        I acknowledge this notice and consent to processing my registration data.
+                                    </label>
                                 </div>
                             </div>
                             
@@ -134,8 +159,8 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script nonce="<%= cspNonce %>">
     function validateRegistration() {
         const txn = document.getElementById('floatingTransaction');
         if (!/^\d{12}$/.test(txn.value)) {
@@ -146,6 +171,15 @@
     }
     
     document.addEventListener("DOMContentLoaded", function() {
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(event) {
+                if (!validateRegistration()) {
+                    event.preventDefault();
+                }
+            });
+        }
+
         const paperPresentationInput = document.querySelector('input[name="technical_event"][value="Paper Presentation"]');
         if (paperPresentationInput) {
             paperPresentationInput.addEventListener('change', function() {
