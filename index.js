@@ -40,14 +40,29 @@ app.set('trust proxy', trustProxySetting);
 
 function validateSecurityConfig() {
     const isProduction = process.env.NODE_ENV === 'production';
+    const missingVars = [];
 
     if (!process.env.MONGO_URI) {
-        throw new Error('MONGO_URI is required.');
+        missingVars.push('MONGO_URI');
     }
 
-    if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+    if (!process.env.SESSION_SECRET) {
+        missingVars.push('SESSION_SECRET');
+    }
+
+    if (missingVars.length > 0) {
+        const message = `Missing required environment variables: ${missingVars.join(', ')}.`;
+        if (isProduction) {
+            console.error(`❌ ${message}`);
+            throw new Error(message);
+        }
+        console.warn(`⚠️ ${message}`);
+    }
+
+    if (process.env.SESSION_SECRET && process.env.SESSION_SECRET.length < 32) {
         const message = 'SESSION_SECRET should be set to a random value with at least 32 characters.';
         if (isProduction) {
+            console.error(`❌ ${message}`);
             throw new Error(message);
         }
         console.warn(`⚠️ ${message}`);
