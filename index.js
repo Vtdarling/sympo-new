@@ -15,8 +15,10 @@ const path = require('path');
 const app = express();
 app.disable('x-powered-by');
 
-const TECH_EVENTS = ['Blind Coding', 'Paper Presentation', 'Bug Smasher', 'Web Weavers'];
-const NON_TECH_EVENTS = ['Gaming', 'Treasure Hunt', 'Photography'];
+const TECH_EVENTS = ['Paper Presentation', 'Style Craft Css', 'Code War'];
+const NON_TECH_EVENTS = ['Free Fire', 'Treasure Hunt', 'Connections'];
+const TECH_EVENTS_NORMALIZED = TECH_EVENTS.map(event => event.toLowerCase().trim());
+const NON_TECH_EVENTS_NORMALIZED = NON_TECH_EVENTS.map(event => event.toLowerCase().trim());
 const MAX_LOGIN_ATTEMPTS = 5;
 const ACCOUNT_LOCK_MS = 15 * 60 * 1000;
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
@@ -354,7 +356,7 @@ function isAuth(req, res, next) {
     next();
 }
 
-app.use(['/home', '/register', '/confirmation', '/logout'], isAuth);
+app.use(['/home', '/register', '/confirmation', '/logout', '/schedule', '/coordinators'], isAuth);
 
 async function registerFailedLogin(user) {
     if (!user) return;
@@ -745,6 +747,24 @@ app.get('/home', isAuth, async (req, res) => {
     }
 });
 
+// SCHEDULE PAGE
+app.get('/schedule', isAuth, (req, res) => {
+    if (Object.keys(req.query || {}).length > 0) {
+        return res.redirect('/schedule');
+    }
+
+    res.render('schedule');
+});
+
+// COORDINATORS PAGE
+app.get('/coordinators', isAuth, (req, res) => {
+    if (Object.keys(req.query || {}).length > 0) {
+        return res.redirect('/coordinators');
+    }
+
+    res.render('coordinators');
+});
+
 // REGISTER PAGE (Pre-fill)
 app.get('/register', isAuth, async (req, res) => {
     if (Object.keys(req.query || {}).length > 0) {
@@ -765,17 +785,26 @@ app.get('/register', isAuth, async (req, res) => {
 // 🛡️ UPDATED REGISTER LOGIC: DUPLICATE CHECK ADDED
 app.post('/register', 
     registerLimiter,
-    body('college').trim().isLength({ min: 2, max: 120 }).escape(),
-    body('technical_event').isIn(TECH_EVENTS),
-    body('non_technical_event').isIn(NON_TECH_EVENTS),
-    body('transaction_id').trim().matches(/^\d{12}$/),
-    body('privacy_notice_ack').equals('yes'),
+    body('college').trim().isLength({ min: 2, max: 120 }).withMessage('Enter a valid college name.').escape(),
+    body('technical_event').trim().custom((value) => {
+        return TECH_EVENTS_NORMALIZED.includes(String(value || '').toLowerCase().trim());
+    }).withMessage('Select a valid technical event.'),
+    body('non_technical_event').trim().custom((value) => {
+        return NON_TECH_EVENTS_NORMALIZED.includes(String(value || '').toLowerCase().trim());
+    }).withMessage('Select a valid non-technical event.'),
+    body('transaction_id').trim().matches(/^\d{12}$/).withMessage('Transaction ID must be exactly 12 digits.'),
+    body('privacy_notice_ack').equals('yes').withMessage('Please accept the privacy notice.'),
     async (req, res) => {
         try {
             if (!req.session.userId) return res.redirect('/signup');
 
-            if (!validationResult(req).isEmpty()) {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
                 const user = await User.findById(req.session.userId);
+                const validationMessage = errors
+                    .array()
+                    .map(err => `${err.path}: ${err.msg || 'Invalid value.'}`)
+                    .join(' | ');
                 await logAuditEvent({
                     eventType: 'registration',
                     outcome: 'validation_failed',
@@ -783,7 +812,7 @@ app.post('/register',
                     userId: req.session.userId
                 });
                 return res.render('register', {
-                    error: "Invalid registration input. Please check all fields.",
+                    error: validationMessage,
                     csrfToken: getCsrfToken(req),
                     user: user
                 });

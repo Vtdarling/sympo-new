@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title> TECQUORA 2K26 | Home</title>
+    <title>TECQUORA 2k26 | Home</title>
     
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/vendor/aos/aos.css" rel="stylesheet">
@@ -14,6 +14,18 @@
         .home-body { background-color: #0f0c29; color: white; }
         .divider-line { width: 60px; height: 3px; }
         .footer-dark { background: #050508; color: #888; }
+        .hero-intro-colorful {
+            background: linear-gradient(90deg, var(--bs-info), var(--bs-warning), var(--bs-danger), var(--bs-info));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 18px rgba(255, 255, 255, 0.2);
+            animation: introGradientShift 4s linear infinite;
+        }
+        @keyframes introGradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
     </style>
 </head>
 <body class="home-body">
@@ -22,7 +34,7 @@
         <div class="container-fluid px-3 d-flex align-items-center">
             
             <a class="navbar-brand fw-bold text-white fs-4" href="#">
-                <i class="fas fa-atom text-info me-2"></i> TECHSYM '26
+                <i class="fas fa-microchip text-info me-2"></i>TECQUORA
             </a>
             
             <form action="/logout" method="POST" class="ms-auto d-lg-none my-0">
@@ -49,7 +61,7 @@
 
                     <li class="nav-item my-2 my-lg-0">
                         <% if (typeof registered !== 'undefined' && registered) { %>
-                             <a id="nav-cta-btn" class="btn btn-success ms-lg-3 fw-bold" href="/confirmation">
+                             <a id="nav-cta-btn" class="btn btn-success ms-lg-3 fw-bold rounded-pill" href="/confirmation">
                                 <i class="fas fa-check-circle me-2"></i>Ticket
                             </a>
                         <% } else { %>
@@ -65,15 +77,15 @@
         <div class="container-fluid px-3">
             <div class="row justify-content-center">
                 <div class="col-12">
-                    <h5 class="text-uppercase text-info letter-spacing-1 mb-3">Department of IT Presents</h5>
-                    <h1 class="glitch-text mb-4">SYMPOSIUM 2026</h1>
-                    <p class="lead mb-5 text-white-50">Join the ultimate convergence of code, creativity, and innovation.</p>
+                    <h5 class="text-uppercase letter-spacing-1 mb-3 fw-bold fs-2 hero-intro-colorful">Department of IT Presents</h5>
+                    <h1 class="glitch-text mb-4 fw-bold display-2">TECQUORA 2k26</h1>
+                    <p class="mb-5 text-white-50 fw-bold fs-3">Join the ultimate convergence of code, creativity, and innovation.</p>
                     
                     <div class="d-flex flex-column-reverse flex-sm-row justify-content-center align-items-center gap-3">
                         <a href="#about" class="btn btn-outline-light rounded-pill px-4 py-2">Learn More</a>
                         
                         <% if (typeof registered !== 'undefined' && registered) { %>
-                            <a id="hero-cta-btn" href="/confirmation" class="btn btn-success btn-lg">
+                            <a id="hero-cta-btn" href="/confirmation" class="btn btn-success btn-lg rounded-pill">
                                 <i class="fas fa-check-circle me-2"></i>View Ticket
                             </a>
                         <% } else { %>
@@ -90,11 +102,15 @@
         <div class="container py-5">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-5 mb-lg-0">
-                    <div class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill fw-bold">Dec 26, 2025</div>
+                    <div class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill fw-bold fs-6">13/03/2026</div>
                     <h2 class="display-5 fw-bold mb-4">Where Innovation <br> Meets <span class="text-info">Intelligence</span></h2>
                     <p class="text-white-50 lead mb-4">
-                        TechSymposium '25 is a national-level technical fest. Compete with the best minds and win cash prizes worth <strong>₹50,000</strong>.
+                        TECQUORA 2k26 is a national-level technical fest. Compete with the best minds and win cash prizes worth <strong>₹50,000</strong>.
                     </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
+                        <a href="/schedule" class="btn btn-outline-info rounded-pill px-4 py-2 fw-bold">Refer Our Event Schedule</a>
+                        <a href="/coordinators" class="btn btn-outline-warning rounded-pill px-4 py-2 fw-bold">Coordinators</a>
+                    </div>
                     <div class="row g-4 mt-2">
                         <div class="col-sm-6">
                             <div class="d-flex align-items-center">
@@ -121,7 +137,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6">
-                  <img id="aboutImage" src="/images/about.jpeg" alt="Abouting" class="img-fluid rounded-4 shadow-lg border border-secondary" data-fallback="https://via.placeholder.com/600x400?text=TechSymposium">
+                  <img id="aboutImage" src="/images/about.jpeg" alt="Abouting" class="img-fluid rounded-4 shadow-lg border border-secondary" data-fallback="https://via.placeholder.com/600x400?text=TECQUORA+2k26">
                 </div>
             </div>
         </div>
@@ -139,23 +155,23 @@
             <div class="row g-4 mb-5">
                 <div class="col-md-4">
                     <div class="custom-card text-center">
-                        <i class="fas fa-laptop-code fa-3x card-icon text-primary"></i>
-                        <h4>Blind Coding</h4>
-                        <p class="text-white-50 small">Type code with your monitor turned off.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="custom-card text-center">
-                        <i class="fas fa-bug fa-3x card-icon text-danger"></i>
-                        <h4>Bug Smasher</h4>
-                        <p class="text-white-50 small">Find and fix bugs in code snippets.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="custom-card text-center">
-                        <i class="fas fa-file-powerpoint fa-3x card-icon text-success"></i>
+                        <i class="fas fa-file-powerpoint fa-3x card-icon text-primary"></i>
                         <h4>Paper Presentation</h4>
-                        <p class="text-white-50 small">Showcase your research on emerging technologies.</p>
+                        <p class="text-white-50 small">Present your innovative ideas with impactful slides.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-palette fa-3x card-icon text-danger"></i>
+                        <h4>Style Craft Css</h4>
+                        <p class="text-white-50 small">Build stylish UI challenges using modern CSS skills.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-laptop-code fa-3x card-icon text-success"></i>
+                        <h4>Code War</h4>
+                        <p class="text-white-50 small">Compete in coding rounds and race against time.</p>
                     </div>
                 </div>
             </div>
@@ -164,9 +180,9 @@
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="custom-card text-center">
-                        <i class="fas fa-gamepad fa-3x card-icon text-warning"></i>
-                        <h4>Gaming</h4>
-                        <p class="text-white-50 small">Valorant and BGMI tournaments.</p>
+                        <i class="fas fa-crosshairs fa-3x card-icon text-warning"></i>
+                        <h4>Free Fire</h4>
+                        <p class="text-white-50 small">Battle with squads and prove your survival strategy.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -178,9 +194,9 @@
                 </div>
                 <div class="col-md-4">
                     <div class="custom-card text-center">
-                        <i class="fas fa-camera fa-3x card-icon text-warning"></i>
-                        <h4>Photography</h4>
-                        <p class="text-white-50 small">Capture the best moments of the event.</p>
+                        <i class="fas fa-link fa-3x card-icon text-warning"></i>
+                        <h4>Connections</h4>
+                        <p class="text-white-50 small">Connect clues fast and solve the ultimate chain puzzle.</p>
                     </div>
                 </div>
             </div>
@@ -189,7 +205,7 @@
                 <% if (typeof registered !== 'undefined' && registered) { %>
                       <a id="bottom-cta-btn" 
                          href="/confirmation"
-                         class="btn btn-success px-5 py-3 fs-5">
+                         class="btn btn-success px-5 py-3 fs-5 rounded-pill">
                         <i class="fas fa-check-circle me-2"></i>View Ticket
                     </a>
                 <% } else { %>
@@ -201,7 +217,7 @@
 
     <footer class="text-center py-4 footer-dark">
         <div class="container">
-            <p class="mb-0">&copy; 2025 Department of Information Technology. All Rights Reserved.</p>
+            <p class="mb-0">&copy; 2026 Department of Information Technology. All Rights Reserved.</p>
         </div>
     </footer>
 
