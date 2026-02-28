@@ -346,7 +346,7 @@ const userSchema = new mongoose.Schema({
     technical_event: { type: String, default: 'Pending' },
     non_technical_event: { type: String, default: 'Pending' },
     transaction_id: { type: String, default: null, select: false },
-    transaction_id_hash: { type: String, default: null, unique: true, sparse: true },
+    transaction_id_hash: { type: String, unique: true, sparse: true },
     transaction_id_last4: { type: String, default: null, select: false },
     loginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Date, default: null },
