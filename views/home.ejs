@@ -15,16 +15,14 @@
         .divider-line { width: 60px; height: 3px; }
         .footer-dark { background: #050508; color: #888; }
         .hero-intro-colorful {
-            background: linear-gradient(90deg, var(--bs-info), var(--bs-warning), var(--bs-danger), var(--bs-info));
-            background-size: 300% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 18px rgba(255, 255, 255, 0.2);
-            animation: introGradientShift 4s linear infinite;
+            color: #ffffff;
+            text-shadow: 2px 2px #ff00de, -2px -2px #00d2ff;
         }
-        @keyframes introGradientShift {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
+        .spot-registration-note {
+            font-size: clamp(1.1rem, 2.3vw, 1.65rem);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 14px rgba(255, 193, 7, 0.35);
         }
     </style>
 </head>
@@ -92,6 +90,8 @@
                             <a id="hero-cta-btn" href="/register" class="btn btn-glow">Register Now</a>
                         <% } %>
                     </div>
+
+                    <p class="mt-3 mb-0 text-warning spot-registration-note">Spot Registration Also Available</p>
 
                 </div>
             </div>

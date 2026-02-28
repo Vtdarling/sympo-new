@@ -89,11 +89,11 @@
                 </div>
             </div>
 
-            <% if(user.transaction_id && !user.transaction_id.startsWith('PENDING')) { %>
+            <% if (user.transaction_id) { %>
             <div class="detail-row detail-row-money">
                 <div class="detail-icon icon-money"><i class="fas fa-receipt"></i></div>
                 <div class="text-break">
-                    <small class="text-white-50 d-block text-uppercase detail-label">Transaction ID</small>
+                    <small class="text-white-50 d-block text-uppercase detail-label">UPI Transaction ID</small>
                     <span class="fw-bold text-white fs-5"><%= user.transaction_id %></span>
                 </div>
             </div>

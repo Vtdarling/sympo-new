@@ -24,6 +24,7 @@ const ACCOUNT_LOCK_MS = 15 * 60 * 1000;
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 const ABSOLUTE_SESSION_MS = 8 * 60 * 60 * 1000;
 const FORCE_HTTPS = process.env.FORCE_HTTPS === 'true' || process.env.NODE_ENV === 'production';
+const SESSION_STORE = (process.env.SESSION_STORE || (process.env.NODE_ENV === 'production' ? 'mongo' : 'memory')).toLowerCase();
 const CONSENT_VERSION = process.env.CONSENT_VERSION || '2026-02';
 const RETENTION_TEMP_USERS_DAYS = Number(process.env.RETENTION_TEMP_USERS_DAYS || 30);
 const RETENTION_AUDIT_LOG_DAYS = Number(process.env.RETENTION_AUDIT_LOG_DAYS || 180);
@@ -139,16 +140,34 @@ app.set('view engine', 'ejs');
 
 /* ---------------- SESSION ---------------- */
 const MongoDBStore = MongoDBStoreFactory(session);
-const sessionStore = new MongoDBStore({
-    uri: process.env.MONGO_URI,
-    collection: 'sessions'
-});
+let sessionStore;
 
-sessionStore.on('error', (err) => {
-    console.error('Session store error:', err);
-});
+if (SESSION_STORE === 'mongo') {
+    try {
+        sessionStore = new MongoDBStore({
+            uri: process.env.MONGO_URI,
+            collection: 'sessions'
+        });
 
-app.use(session({
+        sessionStore.on('error', (err) => {
+            console.error('Session store error:', err);
+            if (process.env.NODE_ENV === 'production') {
+                throw err;
+            }
+        });
+    } catch (err) {
+        if (process.env.NODE_ENV === 'production') {
+            throw err;
+        }
+
+        sessionStore = null;
+        console.warn('⚠️ Falling back to MemoryStore because Mongo session store failed to initialize.');
+    }
+} else {
+    console.warn('⚠️ Using MemoryStore for sessions. Set SESSION_STORE=mongo to use Mongo-backed sessions.');
+}
+
+const sessionOptions = {
     name: 'symposium.sid',
     secret: process.env.SESSION_SECRET,
     proxy: true,
@@ -156,14 +175,19 @@ app.use(session({
     saveUninitialized: false,
     rolling: true,
     unset: 'destroy',
-    store: sessionStore,
     cookie: {
         httpOnly: true,
         secure: FORCE_HTTPS,
         sameSite: 'lax',
         maxAge: IDLE_TIMEOUT_MS
     }
-}));
+};
+
+if (sessionStore) {
+    sessionOptions.store = sessionStore;
+}
+
+app.use(session(sessionOptions));
 
 app.use((req, res, next) => {
     if (!req.session) return next();
@@ -273,14 +297,15 @@ function verifyCsrf(req, res, next) {
 
     const validTokens = Array.isArray(req.session.csrfTokens) ? req.session.csrfTokens : [];
     const requestToken = req.body && req.body._csrf;
+    const invalidLoginRedirect = '/?error=Invalid credentials';
 
     if (!requestToken) {
-        return res.status(403).redirect('/?error=Invalid CSRF token. Please retry.');
+        return res.redirect(invalidLoginRedirect);
     }
 
     const tokenIndex = validTokens.indexOf(requestToken);
     if (tokenIndex === -1) {
-        return res.status(403).redirect('/?error=Invalid CSRF token. Please retry.');
+        return res.redirect(invalidLoginRedirect);
     }
 
     validTokens.splice(tokenIndex, 1);
@@ -515,6 +540,7 @@ app.post(
     body('phone').trim().isNumeric().isLength({ min: 10, max: 10 }),
     async (req, res) => {
         const genericAuthError = '/?error=Invalid credentials';
+        const accountNotFoundError = '/?error=Account not found. Please register first.';
         const requestEmail = req.body && req.body.email ? req.body.email : null;
 
         if (!validationResult(req).isEmpty()) {
@@ -541,7 +567,7 @@ app.post(
                     req,
                     email
                 });
-                return res.redirect(genericAuthError);
+                return res.redirect(accountNotFoundError);
             }
 
             if (userByEmail.lockUntil && userByEmail.lockUntil.getTime() > Date.now()) {
@@ -650,7 +676,6 @@ app.post('/signup',
     body('email').isEmail().normalizeEmail(),
     body('phone').trim().isNumeric().isLength({ min: 10, max: 10 }),
     body('name').trim().isLength({ min: 2, max: 60 }).escape(),
-    body('privacy_consent').equals('yes'),
     async (req, res) => {
         try {
             if (!validationResult(req).isEmpty()) {
@@ -686,10 +711,7 @@ app.post('/signup',
                 event_id: tempEventId, 
                 name: req.body.name,
                 email: req.body.email,
-                phone: req.body.phone,
-                privacyConsent: true,
-                consentVersion: CONSENT_VERSION,
-                consentGivenAt: new Date()
+                phone: req.body.phone
             });
 
             await user.save();
@@ -767,16 +789,15 @@ app.get('/coordinators', isAuth, (req, res) => {
 
 // REGISTER PAGE (Pre-fill)
 app.get('/register', isAuth, async (req, res) => {
-    if (Object.keys(req.query || {}).length > 0) {
-        return res.redirect('/register');
-    }
-
     let user = null;
     if (req.session.userId) {
         user = await User.findById(req.session.userId);
     }
+
+    const error = typeof req.query.error === 'string' ? req.query.error : null;
+
     res.render('register', {
-        error: null,
+        error,
         csrfToken: getCsrfToken(req),
         user: user
     });
@@ -793,7 +814,6 @@ app.post('/register',
         return NON_TECH_EVENTS_NORMALIZED.includes(String(value || '').toLowerCase().trim());
     }).withMessage('Select a valid non-technical event.'),
     body('transaction_id').trim().matches(/^\d{12}$/).withMessage('Transaction ID must be exactly 12 digits.'),
-    body('privacy_notice_ack').equals('yes').withMessage('Please accept the privacy notice.'),
     async (req, res) => {
         try {
             if (!req.session.userId) return res.redirect('/signup');
@@ -803,7 +823,7 @@ app.post('/register',
                 const user = await User.findById(req.session.userId);
                 const validationMessage = errors
                     .array()
-                    .map(err => `${err.path}: ${err.msg || 'Invalid value.'}`)
+                    .map(err => err.msg || 'Invalid value.')
                     .join(' | ');
                 await logAuditEvent({
                     eventType: 'registration',
@@ -870,7 +890,7 @@ app.post('/register',
             currentUser.non_technical_event = req.body.non_technical_event;
             currentUser.transaction_id_hash = hashSensitiveValue(req.body.transaction_id);
             currentUser.transaction_id_last4 = req.body.transaction_id.slice(-4);
-            currentUser.transaction_id = null;
+            currentUser.transaction_id = req.body.transaction_id;
             currentUser.privacyConsent = true;
             currentUser.consentVersion = CONSENT_VERSION;
             currentUser.consentGivenAt = currentUser.consentGivenAt || new Date();
@@ -918,7 +938,7 @@ app.get('/confirmation', isAuth, async (req, res) => {
     }
 
     try {
-        const user = await User.findById(req.session.userId);
+        const user = await User.findById(req.session.userId).select('+transaction_id +transaction_id_last4');
         if (!user) return res.redirect('/');
         res.render('confirmation', { user });
     } catch (err) {

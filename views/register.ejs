@@ -9,21 +9,89 @@
     <link rel="stylesheet" href="/vendor/animate/animate.min.css"/>
     <link rel="stylesheet" href="/css/style.css">
     <style nonce="<%= cspNonce %>">
-        .btn-bright { background: linear-gradient(45deg, #FF512F 0%, #DD2476 100%); border: none; color: white; box-shadow: 0 4px 15px rgba(221, 36, 118, 0.5); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-bright:hover { background: linear-gradient(45deg, #DD2476 0%, #FF512F 100%); transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(221, 36, 118, 0.7); color: white; }
+        .btn-bright { background: linear-gradient(45deg, #ff6a00 0%, #ee0979 55%, #c400ff 100%); border: none; color: white; box-shadow: 0 8px 22px rgba(221, 36, 118, 0.45); transition: all 0.25s ease; text-transform: uppercase; letter-spacing: 1px; border-radius: 14px; }
+        .btn-bright:hover { background: linear-gradient(45deg, #ee0979 0%, #ff6a00 55%, #ffbe0b 100%); transform: translateY(-3px) scale(1.01); box-shadow: 0 12px 28px rgba(221, 36, 118, 0.62); color: white; }
         .error-message { color: #ff6b6b; font-size: 0.85em; margin-top: 5px; display: none; text-align: left; padding-left: 5px; animation: fadeIn 0.3s; }
         .server-alert { background: rgba(220, 53, 69, 0.25); border: 1px solid #dc3545; color: #ffcccc; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; font-weight: 500; animation: shake 0.5s; }
+        .server-alert-list {
+            margin: 8px 0 0 0;
+            padding-left: 18px;
+            text-align: left;
+        }
+        .server-alert-list li {
+            margin-bottom: 4px;
+        }
+        .client-error-banner {
+            display: none;
+        }
         @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        /* Readonly input style */
         .glass-input[readonly] { background: rgba(255, 255, 255, 0.05) !important; color: #aaa !important; cursor: not-allowed; }
         .register-shell { z-index: 2; }
-        .qr-image { width: 180px; height: 180px; }
-        .privacy-box {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 12px;
+        .register-card {
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 20px 45px rgba(10, 6, 30, 0.42);
+        }
+        .register-header {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+        .register-title.text-purple-elegant {
+            letter-spacing: 0.4px;
+            color: #ffd95e !important;
+            text-shadow: 0 0 14px rgba(255, 217, 94, 0.45);
+        }
+        .register-subtitle {
+            color: rgba(255, 255, 255, 0.86);
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            animation: subtitleGlow 2.8s ease-in-out infinite;
+        }
+        .register-chip-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .register-chip {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            padding: 6px 11px;
+            border-radius: 999px;
+            backdrop-filter: blur(8px);
+        }
+        .register-section {
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 22px;
+        }
+        .section-title.text-purple-elegant {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px !important;
+            font-size: 0.82rem;
+            letter-spacing: 0.8px;
+            opacity: 0.95;
+            color: #77ddff !important;
+            text-shadow: none;
+            font-weight: 800;
+            animation: sectionTitlePulse 2.2s ease-in-out infinite;
+        }
+        @keyframes subtitleGlow {
+            0%, 100% { opacity: 0.9; text-shadow: 0 0 0 rgba(119, 221, 255, 0); }
+            50% { opacity: 1; text-shadow: 0 0 10px rgba(119, 221, 255, 0.28); }
+        }
+        @keyframes sectionTitlePulse {
+            0%, 100% { opacity: 0.9; text-shadow: 0 0 0 rgba(119, 221, 255, 0); }
+            50% { opacity: 1; text-shadow: 0 0 8px rgba(119, 221, 255, 0.35); }
         }
         .text-purple-elegant {
             color: #ffffff !important;
@@ -34,38 +102,129 @@
         .register-page .event-tile { color: rgba(255, 255, 255, 0.9); }
         .register-page .event-tile span { font-weight: 500; }
         .register-page .form-check-label { color: rgba(255, 255, 255, 0.88) !important; }
+        .register-page .event-tile {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 14px;
+        }
+        .register-page .event-grid {
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        .register-page .event-tile:hover {
+            border-color: rgba(0, 210, 255, 0.5);
+            box-shadow: 0 10px 24px rgba(0, 210, 255, 0.12);
+        }
+        .register-page .btn-check:checked + .event-tile {
+            box-shadow: 0 10px 24px rgba(255, 95, 109, 0.42);
+        }
+        .payment-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-radius: 14px;
+        }
+        .upi-pill {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #fff;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 0.83rem;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 576px) {
+            .register-shell {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                padding-top: 1.25rem !important;
+                padding-bottom: 1.25rem !important;
+            }
+            .register-shell .row {
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .register-shell .col-lg-8,
+            .register-shell .col-md-10 {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .register-card .card-header {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .register-card .card-body {
+                padding: 1rem !important;
+            }
+            .register-section {
+                margin-bottom: 18px;
+            }
+            .register-page .event-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+            .register-page .event-tile {
+                padding: 12px 8px;
+            }
+            .register-chip {
+                font-size: 0.68rem;
+                padding: 5px 9px;
+            }
+        }
+        @media (max-width: 380px) {
+            .register-page .event-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body class="register-page">
     <div class="circles"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-    <div class="container py-5 position-relative register-shell">
+    <div class="container py-3 py-md-4 position-relative register-shell">
         <div class="row justify-content-center">
             <div class="col-lg-8 col-md-10">
-                <div class="animate__animated animate__fadeInDown">
-                    <a href="/home" class="text-white text-decoration-none fw-bold mb-4 d-inline-block hover-scale"><i class="fas fa-arrow-left me-2"></i> Back to Dashboard</a>
+                <div class="animate__animated animate__fadeInDown text-end">
+                    <a href="/home" class="btn home-btn rounded-pill px-4 mb-2 d-inline-block"><i class="fas fa-arrow-left me-2"></i>Home</a>
                 </div>
-                <div class="card glass-card border-0 shadow-lg animate__animated animate__fadeInUp">
-                    <div class="card-header bg-transparent text-center border-0 pt-4 pb-0">
+                <div class="card glass-card register-card border-0 shadow-lg animate__animated animate__fadeInUp">
+                    <div class="card-header register-header text-center border-0 pt-4 pb-0">
                         <div class="icon-box mb-3 mx-auto"><i class="fas fa-rocket fa-2x text-white"></i></div>
-                        <h2 class="fw-bold text-purple-elegant mb-1">Complete Registration</h2>
-                        <p class="text-white-50">Select your events and confirm payment</p>
+                        <h2 class="fw-bold text-purple-elegant register-title mb-1">Complete Registration</h2>
+                        <p class="register-subtitle mb-0">Select your events and confirm payment</p>
+                        <div class="register-chip-row">
+                            <span class="register-chip">One Technical Event</span>
+                            <span class="register-chip">One Non-Technical Event</span>
+                            <span class="register-chip">UPI Verification Required</span>
+                        </div>
                     </div>
                     <div class="card-body p-4 p-md-5">
                         
-                        <% if (locals.error && error !== null) { %>
-                            <div class="server-alert">
-                                <i class="fas fa-exclamation-triangle me-2"></i> <%= error %>
+                        <div id="clientErrorBanner" class="server-alert client-error-banner" role="alert" aria-live="polite"></div>
+
+                        <% if (typeof error === 'string' && error.trim()) { %>
+                            <% const errorItems = error.split('|').map(item => item.trim()).filter(Boolean); %>
+                            <div class="server-alert" role="alert" aria-live="polite">
+                                <i class="fas fa-exclamation-triangle me-2"></i><strong>Please check:</strong>
+                                <% if (errorItems.length > 1) { %>
+                                    <ul class="server-alert-list">
+                                        <% errorItems.forEach(function(item) { %>
+                                            <li><%= item %></li>
+                                        <% }); %>
+                                    </ul>
+                                <% } else { %>
+                                    <div class="mt-1"><%= errorItems[0] %></div>
+                                <% } %>
                             </div>
                         <% } %>
 
-                        <form action="/register" method="POST" id="registerForm">
+                        <form action="/register" method="POST" id="registerForm" novalidate>
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Personal Details (Pre-filled)</h6>
-                            <div class="row g-3 mb-4">
+                            <div class="register-section">
+                            <h6 class="text-uppercase text-purple-elegant section-title fw-bold fs-7"><i class="fas fa-id-card"></i>Personal Details</h6>
+                            <div class="row g-3">
                                 <div class="col-md-12">
                                     <div class="form-floating">
-                                        <!-- AUTO-FILLED & READONLY -->
                                         <input type="text" name="name" class="form-control glass-input" id="floatingName" placeholder="Name" value="<%= (locals.user && user.name) ? user.name : '' %>" <%= (locals.user) ? 'readonly' : '' %> required>
                                         <label for="floatingName">Full Name</label>
                                     </div>
@@ -77,27 +236,29 @@
                                     </div>
                                 </div>
                             </div>
+                            </div>
                             
-                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Contact Info (Pre-filled)</h6>
-                            <div class="row g-3 mb-4">
+                            <div class="register-section">
+                            <h6 class="text-uppercase text-purple-elegant section-title fw-bold fs-7"><i class="fas fa-address-book"></i>Contact Info</h6>
+                            <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <!-- AUTO-FILLED & READONLY -->
                                         <input type="email" name="email" class="form-control glass-input" id="floatingEmail" placeholder="name@example.com" value="<%= (locals.user && user.email) ? user.email : '' %>" <%= (locals.user) ? 'readonly' : '' %> required>
                                         <label for="floatingEmail">Email Address</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <!-- AUTO-FILLED & READONLY -->
                                         <input type="tel" name="phone" class="form-control glass-input" id="floatingPhone" placeholder="Phone" maxlength="10" value="<%= (locals.user && user.phone) ? user.phone : '' %>" <%= (locals.user) ? 'readonly' : '' %> required>
                                         <label for="floatingPhone">Phone Number</label>
                                     </div>
                                 </div>
                             </div>
+                            </div>
                             
-                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Select One Technical Event</h6>
-                            <div class="event-grid mb-4">
+                            <div class="register-section">
+                            <h6 class="text-uppercase text-purple-elegant section-title fw-bold fs-7"><i class="fas fa-code"></i>Select One Technical Event</h6>
+                            <div class="event-grid">
                                 <input type="radio" class="btn-check" name="technical_event" id="tech1" value="Paper Presentation" required>
                                 <label class="event-tile" for="tech1"><i class="fas fa-file-powerpoint mb-2"></i><span>Paper Presentation</span></label>
                                 
@@ -107,9 +268,11 @@
                                 <input type="radio" class="btn-check" name="technical_event" id="tech3" value="Code War">
                                 <label class="event-tile" for="tech3"><i class="fas fa-laptop-code mb-2"></i><span>Code War</span></label>
                             </div>
+                            </div>
                             
-                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Select One Non-Technical Event</h6>
-                            <div class="event-grid mb-5">
+                            <div class="register-section">
+                            <h6 class="text-uppercase text-purple-elegant section-title fw-bold fs-7"><i class="fas fa-gamepad"></i>Select One Non-Technical Event</h6>
+                            <div class="event-grid">
                                 <input type="radio" class="btn-check" name="non_technical_event" id="nontech1" value="Free Fire" required>
                                 <label class="event-tile" for="nontech1"><i class="fas fa-crosshairs mb-2"></i><span>Free Fire</span></label>
                                 
@@ -119,12 +282,14 @@
                                 <input type="radio" class="btn-check" name="non_technical_event" id="nontech3" value="Connections">
                                 <label class="event-tile" for="nontech3"><i class="fas fa-link mb-2"></i><span>Connections</span></label>
                             </div>
+                            </div>
                             
-                            <h6 class="text-uppercase text-purple-elegant mb-3 fw-bold fs-7">Payment Details</h6>
-                            <div class="card bg-dark bg-opacity-25 border-secondary mb-4">
+                            <div class="register-section mb-4">
+                            <h6 class="text-uppercase text-purple-elegant section-title fw-bold fs-7"><i class="fas fa-wallet"></i>Payment Details</h6>
+                            <div class="card payment-card mb-0">
                                 <div class="card-body text-center">
-                                    <p class="text-white small mb-3">Pay using GPay / PhonePe / Paytm with the details below</p>
-                                    <p class="text-white mb-1"><strong>UPI Number:</strong> 8825676740</p>
+                                    <p class="text-white small mb-3">Pay using UPI</p>
+                                    <p class="upi-pill mb-2"><strong>UPI Number:</strong> 8825676740</p>
                                     <p class="text-white-50 small mb-3"><strong>UPI ID:</strong> 8825676740@cnrb</p>
                                     
                                     <div class="form-floating text-start">
@@ -134,36 +299,82 @@
                                     <p class="text-white-50 small mt-2 mb-0">Note: Transaction ID will be verified.</p>
                                 </div>
                             </div>
-
-                            <div class="privacy-box mb-4">
-                                <p class="text-white-50 small mb-2">Privacy notice: Registration data is used for event operations, fraud checks, and participant verification. Payment references are stored in privacy-preserving form.</p>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="yes" id="privacyNoticeAck" name="privacy_notice_ack" required>
-                                    <label class="form-check-label text-white-50 small" for="privacyNoticeAck">
-                                        I acknowledge this notice and consent to processing my registration data.
-                                    </label>
-                                </div>
                             </div>
-                            
+
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-bright btn-lg fw-bold py-3">CONFIRM REGISTRATION <i class="fas fa-check-circle ms-2"></i></button>
+                                <button type="submit" class="btn btn-bright btn-lg fw-bold py-3">Register <i class="fas fa-check-circle ms-2"></i></button>
                             </div>
                         </form>
                     </div>
                 </div>
-                <p class="text-center text-white-50 mt-4 small">Technical issues? Contact support@symposium.com</p>
+                <p class="text-center text-white-50 mt-4 small">Technical issues? Contact tecquora26@gmail.com</p>
             </div>
         </div>
     </div>
     
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script nonce="<%= cspNonce %>">
+    function showTopClientError(messages) {
+        const banner = document.getElementById('clientErrorBanner');
+        if (!banner) return;
+
+        const listItems = messages.map(msg => '<li>' + msg + '</li>').join('');
+        banner.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i><strong>Please check:</strong><ul class="server-alert-list">' + listItems + '</ul>';
+        banner.style.display = 'block';
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function clearTopClientError() {
+        const banner = document.getElementById('clientErrorBanner');
+        if (!banner) return;
+        banner.style.display = 'none';
+        banner.textContent = '';
+    }
+
     function validateRegistration() {
+        const errors = [];
+        const name = document.getElementById('floatingName');
+        const college = document.getElementById('floatingCollege');
+        const email = document.getElementById('floatingEmail');
+        const phone = document.getElementById('floatingPhone');
         const txn = document.getElementById('floatingTransaction');
-        if (!/^\d{12}$/.test(txn.value)) {
-            alert("Transaction ID must be exactly 12 digits");
+        const technicalEventChecked = document.querySelector('input[name="technical_event"]:checked');
+        const nonTechnicalEventChecked = document.querySelector('input[name="non_technical_event"]:checked');
+
+        if (!name || !String(name.value || '').trim()) {
+            errors.push('Full Name is required.');
+        }
+
+        if (!college || !String(college.value || '').trim()) {
+            errors.push('College / Institution is required.');
+        }
+
+        if (!email || !String(email.value || '').trim()) {
+            errors.push('Email Address is required.');
+        }
+
+        if (!phone || !/^\d{10}$/.test(String(phone.value || '').trim())) {
+            errors.push('Phone Number must be exactly 10 digits.');
+        }
+
+        if (!technicalEventChecked) {
+            errors.push('Please select one Technical Event.');
+        }
+
+        if (!nonTechnicalEventChecked) {
+            errors.push('Please select one Non-Technical Event.');
+        }
+
+        if (!txn || !/^\d{12}$/.test(String(txn.value || '').trim())) {
+            errors.push('Transaction ID must be exactly 12 digits.');
+        }
+
+        if (errors.length > 0) {
+            showTopClientError(errors);
             return false;
         }
+
+        clearTopClientError();
         return true;
     }
     

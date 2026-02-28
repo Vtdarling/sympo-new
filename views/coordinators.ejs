@@ -4,50 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coordinators | TECQUORA 2k26</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        body {
-            min-height: 100vh;
-            background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
-            color: #fff;
-        }
-        .coord-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            backdrop-filter: blur(8px);
-            height: 100%;
-        }
-    </style>
 </head>
-<body>
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold mb-0">TECQUORA 2k26 Coordinators</h1>
-            <a href="/home" class="btn btn-outline-light rounded-pill px-4">
-                <i class="fas fa-arrow-left me-2"></i>Back to Home
-            </a>
+<body class="coordinators-page">
+    <div class="container coordinator-wrap py-5">
+        <div class="coordinator-header d-flex justify-content-between align-items-center mb-4">
+            <h1 class="hero-title fw-black fw-bold mb-0">Coordinators</h1>
         </div>
 
-        <p class="text-white-50 mb-4">Contact the coordinators below for event-related queries.</p>
+        <p class="lead-text mb-4 fw-semibold">Contact the convenor and coordinators below for event-related queries.</p>
 
         <div class="row g-4">
-            <div class="col-md-6">
-                <div class="coord-card p-4">
-                    <h5 class="fw-bold mb-3"><i class="fas fa-user-tie me-2 text-info"></i>Faculty Coordinator</h5>
-                    <p class="mb-2"><strong>Name:</strong> To be updated</p>
-                    <p class="mb-0"><strong>Phone:</strong> To be updated</p>
+            <div class="col-12">
+                <div class="coordinator-card p-4">
+                    <span class="badge-strip badge-convenor">LEAD</span>
+                    <h5 class="card-title fw-bold"><i class="fas fa-user-shield text-success me-2"></i>CONVENOR</h5>
+                    <p class="contact-line">
+                        <span class="contact-name me-1">NAME:</span>
+                        <span class="contact-value">Dr. M. Sabrigiriraj</span>
+                    </p>
+                    <p class="contact-line mb-0">
+                        <span class="contact-name me-1">DESIGNATION:</span>
+                        <span class="contact-value">Professor &amp; Head</span>
+                    </p>
                 </div>
             </div>
+
             <div class="col-md-6">
-                <div class="coord-card p-4">
-                    <h5 class="fw-bold mb-3"><i class="fas fa-users me-2 text-warning"></i>Student Coordinator</h5>
-                    <p class="mb-2"><strong>Name:</strong> To be updated</p>
-                    <p class="mb-0"><strong>Phone:</strong> To be updated</p>
+                <div class="coordinator-card p-4">
+                    <span class="badge-strip badge-student">TEAM</span>
+                    <h5 class="card-title fw-bold"><i class="fas fa-users text-warning me-2"></i>STUDENT COORDINATORS</h5>
+                    <p class="contact-line">
+                        <span class="contact-name">Rishi T:</span>
+                        <span class="contact-value">7094031593</span>
+                    </p>
+                    <p class="contact-line">
+                        <span class="contact-name">Haridass S:</span>
+                        <span class="contact-value">9025815771</span>
+                    </p>
+                    <p class="contact-line">
+                        <span class="contact-name">Supritha S:</span>
+                        <span class="contact-value">8072694824</span>
+                    </p>
+                    <p class="contact-line mb-0">
+                        <span class="contact-name">Karunakaran K:</span>
+                        <span class="contact-value">781281494</span>
+                    </p>
                 </div>
             </div>
+
+            <div class="col-md-6">
+                <div class="coordinator-card p-4">
+                    <span class="badge-strip badge-faculty">MENTORS</span>
+                    <h5 class="card-title fw-bold"><i class="fas fa-user-tie text-info me-2"></i>FACULTY COORDINATORS</h5>
+                    <p class="contact-line">
+                        <span class="contact-name">Mr. Praveen Kumar R:</span>
+                        <span class="contact-value">9894260251</span>
+                    </p>
+                    <p class="contact-line">
+                        <span class="contact-name">Ms. Revathi P:</span>
+                        <span class="contact-value">9843478529</span>
+                    </p>
+                    <p class="contact-line mb-0">
+                        <span class="contact-name">Ms. Athira S:</span>
+                        <span class="contact-value">9747832874</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-home-footer mt-4 mt-md-5">
+            <a href="/home" class="btn home-btn rounded-pill px-4">
+                <i class="fas fa-arrow-left me-2"></i>Home
+            </a>
         </div>
     </div>
 

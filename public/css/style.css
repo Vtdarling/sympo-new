@@ -166,7 +166,7 @@ footer {
     background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
     min-height: 100vh;
     position: relative;
-    padding-top: 80px; 
+    padding-top: 28px; 
     padding-bottom: 50px;
     width: 100%;
 }
@@ -284,3 +284,270 @@ footer {
 .hover-scale { transition: transform 0.2s; }
 .hover-scale:hover { transform: translateX(-5px); }
 .letter-spacing-1 { letter-spacing: 1px; }
+
+/* =========================================
+   COORDINATORS PAGE STYLES (coordinators.ejs)
+   ========================================= */
+.coordinators-page {
+    min-height: 100vh;
+    margin: 0;
+    color: #fff;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255, 87, 163, 0.25), transparent 40%),
+        radial-gradient(circle at 80% 10%, rgba(67, 97, 238, 0.35), transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(0, 209, 178, 0.24), transparent 45%),
+        linear-gradient(140deg, #140b2d 0%, #21104b 45%, #180f36 100%);
+    -webkit-font-smoothing: antialiased;
+}
+
+.coordinator-wrap {
+    max-width: 1100px;
+}
+
+.coordinator-header {
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.hero-title {
+    font-size: clamp(1.6rem, 3.4vw, 2.35rem);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: #ffde59;
+    text-shadow: 0 0 10px rgba(255, 222, 89, 0.72), 0 0 24px rgba(255, 184, 0, 0.52);
+}
+
+.home-btn {
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: #fff;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+    transition: 0.25s ease;
+}
+
+.home-btn:hover {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(90deg, #ff4db8, #6a5cff);
+    transform: translateY(-2px);
+}
+
+.lead-text {
+    max-width: 700px;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: #d9ddf8;
+}
+
+.coordinator-card {
+    height: 100%;
+    padding: 1.5rem !important;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+    box-shadow: 0 18px 34px rgba(7, 4, 20, 0.45);
+    backdrop-filter: blur(10px);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    letter-spacing: 0.4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 1rem;
+    color: #7dd3ff;
+}
+
+.badge-strip {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    margin-bottom: 12px;
+    color: #190f34;
+}
+
+.badge-convenor { background: linear-gradient(90deg, #1bc98e, #14a873); }
+.badge-student { background: linear-gradient(90deg, #ff9f1c, #ff5f6d); }
+.badge-faculty { background: linear-gradient(90deg, #4cc9f0, #4361ee); }
+
+.contact-line {
+    margin-bottom: 0.8rem;
+    font-weight: 700;
+    color: #f8f9ff;
+}
+
+.contact-line:last-child {
+    margin-bottom: 0;
+}
+
+.contact-name {
+    color: #ffd670;
+}
+
+.contact-value {
+    color: #f8f9ff;
+}
+
+.contact-name,
+.contact-value {
+    overflow-wrap: anywhere;
+}
+
+.page-home-footer {
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 991.98px) {
+    .coordinator-wrap {
+        max-width: 900px;
+    }
+
+    .lead-text {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .coordinator-wrap {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    .coordinator-header {
+        position: relative;
+        flex-direction: column;
+        align-items: stretch !important;
+        padding-top: 0.2rem;
+        margin-bottom: 1rem !important;
+    }
+
+    .hero-title {
+        text-align: center;
+        font-size: 1.7rem;
+    }
+
+    .coordinator-header .home-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: auto;
+        padding: 0.48rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .lead-text {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 1rem !important;
+    }
+
+    .card-title {
+        font-size: 1.08rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .coordinator-wrap {
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+    }
+
+    .coordinator-header .home-btn {
+        top: 0;
+        right: 0;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    .hero-title {
+        font-size: 1.45rem;
+        letter-spacing: 0.5px;
+    }
+
+    .coordinator-card {
+        border-radius: 16px;
+        padding: 1.1rem !important;
+    }
+
+    .badge-strip {
+        font-size: 0.72rem;
+        padding: 5px 10px;
+    }
+
+    .contact-line {
+        font-size: 0.95rem;
+        line-height: 1.45;
+    }
+}
+
+/* =========================================
+   SCHEDULE PAGE STYLES (schedule.ejs)
+   ========================================= */
+.schedule-wrap {
+    max-width: 1100px;
+}
+
+.schedule-page .hero-title {
+    color: #ffd24d;
+    text-shadow: 0 0 10px rgba(255, 210, 77, 0.72), 0 0 22px rgba(255, 180, 0, 0.52);
+}
+
+.schedule-date {
+    color: #d8ddff;
+    font-size: 1.02rem;
+    font-weight: 600;
+}
+
+.schedule-card {
+    border-radius: 20px;
+}
+
+.schedule-table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.04);
+    --bs-table-color: #fff;
+    --bs-table-border-color: rgba(255, 255, 255, 0.15);
+}
+
+.schedule-table thead th {
+    color: #72d9ff;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    border-bottom-width: 2px;
+    white-space: nowrap;
+}
+
+.schedule-table td {
+    color: #f6f8ff;
+    font-weight: 600;
+}
+
+@media (max-width: 767.98px) {
+    .schedule-date {
+        text-align: center;
+        margin-bottom: 1rem !important;
+    }
+
+    .schedule-table {
+        font-size: 0.92rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .schedule-table {
+        font-size: 0.86rem;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+        padding: 0.55rem;
+    }
+}
