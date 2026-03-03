@@ -21,6 +21,14 @@
 - The app validates critical env values on startup:
    - `MONGO_URI` is required.
    - `SESSION_SECRET` must be present and strong (minimum recommended length enforced).
+- In production, strict runtime hardening checks are enforced:
+   - `SESSION_STORE=mongo` is mandatory.
+   - `TRUST_PROXY` must be explicitly set (`true` or `false`) when strict proxy validation is enabled.
+   - With `FORCE_HTTPS=true`, production must use `TRUST_PROXY=true` when behind a reverse proxy.
+- Backup protection controls are validated in production:
+   - `BACKUP_ENCRYPTION_ENABLED=true`
+   - `BACKUP_ACCESS_AUDIT_ENABLED=true`
+   - `BACKUP_ENCRYPTION_KEY_ID` must be configured.
 - Payment destination values should be configured via environment variables:
    - `PAYMENT_UPI_NUMBER`
    - `PAYMENT_UPI_ID`
@@ -65,6 +73,16 @@ This application is configured to collect only data required for attendee onboar
 - Auth abuse monitoring tracks failed attempts per IP over a rolling window.
 - Security alerts are sent when abuse thresholds are reached (`AUTH_ABUSE_THRESHOLD`) or account lockouts occur.
 - Configure `SECURITY_ALERT_TO` to receive security notifications.
+
+### Security Header Verification
+
+- The app applies secure HTTP headers via `helmet`.
+- Runtime verification checks required headers on each response and logs missing-header events:
+   - `Content-Security-Policy`
+   - `Strict-Transport-Security`
+   - `X-Content-Type-Options`
+   - `X-Frame-Options`
+   - `Referrer-Policy`
 
 ### Compliance Guidance
 
@@ -124,12 +142,30 @@ To align with GDPR/DPDP/other privacy frameworks:
 
 ---
 
-## 4) Immediate Checklist
+## 4) Automated Security Checks in CI
+
+GitHub Actions workflow at `.github/workflows/security-ci.yml` runs on push and pull request:
+
+- **Dependency Audit**: `npm audit --omit=dev --audit-level=high`
+- **SAST**: Semgrep (`p/default` ruleset)
+- **Secret Scanning**: Gitleaks full-history scan
+
+These checks provide baseline guardrails for vulnerable dependencies, insecure code patterns, and accidental secret exposure before deployment.
+
+---
+
+## 5) Immediate Checklist
 
 - [ ] Set `NODE_ENV=production`
 - [ ] Set `FORCE_HTTPS=true`
+- [ ] Set `SESSION_STORE=mongo`
+- [ ] Set `TRUST_PROXY=true` (if behind reverse proxy)
 - [ ] Set strong `SESSION_SECRET`
+- [ ] Set `BACKUP_ENCRYPTION_ENABLED=true`
+- [ ] Set `BACKUP_ACCESS_AUDIT_ENABLED=true`
+- [ ] Set `BACKUP_ENCRYPTION_KEY_ID`
 - [ ] Configure SMTP for security notifications
 - [ ] Set `PAYMENT_UPI_NUMBER` and `PAYMENT_UPI_ID`
 - [ ] Verify reverse proxy forwards `X-Forwarded-Proto`
+- [ ] Enable GitHub Actions security workflow checks
 - [ ] Review retention/deletion policy with legal/compliance team

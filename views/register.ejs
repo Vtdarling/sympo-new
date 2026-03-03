@@ -118,6 +118,25 @@
         .register-page .btn-check:checked + .event-tile {
             box-shadow: 0 10px 24px rgba(255, 95, 109, 0.42);
         }
+        .register-page .btn-check:disabled + .event-tile {
+            opacity: 0.58;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+        .register-page .btn-check:disabled + .event-tile:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .event-full-badge {
+            margin-top: 4px;
+            font-size: 0.64rem;
+            font-weight: 800;
+            color: #ffb3b3;
+            letter-spacing: 0.45px;
+            text-transform: uppercase;
+        }
         .payment-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -132,6 +151,26 @@
             padding: 7px 12px;
             font-size: 0.83rem;
             margin-bottom: 10px;
+        }
+        .upi-copy-btn {
+            font-size: 0.72rem;
+            line-height: 1.1;
+            padding: 3px 8px;
+        }
+        .upi-number-value {
+            color: #ffd95e;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+        .banking-name-value {
+            color: #77ddff;
+            font-weight: 700;
+            letter-spacing: 0.25px;
+        }
+        .fee-value {
+            color: #ffd95e;
+            font-weight: 800;
+            letter-spacing: 0.3px;
         }
         @media (max-width: 576px) {
             .register-shell {
@@ -219,6 +258,8 @@
 
                         <form action="/register" method="POST" id="registerForm" novalidate>
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <% const technicalAvailability = (locals.eventAvailability && eventAvailability.technical) ? eventAvailability.technical : {}; %>
+                            <% const nonTechnicalAvailability = (locals.eventAvailability && eventAvailability.nonTechnical) ? eventAvailability.nonTechnical : {}; %>
 
                             <div class="register-section">
                             <h6 class="text-uppercase text-purple-elegant section-title fw-bold fs-7"><i class="fas fa-id-card"></i>Personal Details</h6>
@@ -259,28 +300,28 @@
                             <div class="register-section">
                             <h6 class="text-uppercase text-purple-elegant section-title fw-bold fs-7"><i class="fas fa-code"></i>Select One Technical Event</h6>
                             <div class="event-grid">
-                                <input type="radio" class="btn-check" name="technical_event" id="tech1" value="Paper Presentation" required>
-                                <label class="event-tile" for="tech1"><i class="fas fa-file-powerpoint mb-2"></i><span>Paper Presentation</span></label>
+                                <input type="radio" class="btn-check" name="technical_event" id="tech1" value="Paper Presentation" <%= (technicalAvailability['Paper Presentation'] && technicalAvailability['Paper Presentation'].isFull) ? 'disabled' : '' %> required>
+                                <label class="event-tile" for="tech1"><i class="fas fa-file-powerpoint mb-2"></i><span>Paper Presentation</span><% if (technicalAvailability['Paper Presentation'] && technicalAvailability['Paper Presentation'].isFull) { %><small class="event-full-badge">Full</small><% } %></label>
                                 
-                                <input type="radio" class="btn-check" name="technical_event" id="tech2" value="Style Craft Css">
-                                <label class="event-tile" for="tech2"><i class="fas fa-palette mb-2"></i><span>Style Craft Css</span></label>
+                                <input type="radio" class="btn-check" name="technical_event" id="tech2" value="Style Craft Css" <%= (technicalAvailability['Style Craft Css'] && technicalAvailability['Style Craft Css'].isFull) ? 'disabled' : '' %>>
+                                <label class="event-tile" for="tech2"><i class="fas fa-palette mb-2"></i><span>Style Craft Css</span><% if (technicalAvailability['Style Craft Css'] && technicalAvailability['Style Craft Css'].isFull) { %><small class="event-full-badge">Full</small><% } %></label>
                                 
-                                <input type="radio" class="btn-check" name="technical_event" id="tech3" value="Code War">
-                                <label class="event-tile" for="tech3"><i class="fas fa-laptop-code mb-2"></i><span>Code War</span></label>
+                                <input type="radio" class="btn-check" name="technical_event" id="tech3" value="Technical Quizz" <%= (technicalAvailability['Technical Quizz'] && technicalAvailability['Technical Quizz'].isFull) ? 'disabled' : '' %>>
+                                <label class="event-tile" for="tech3"><i class="fas fa-laptop-code mb-2"></i><span>Technical Quizz</span><% if (technicalAvailability['Technical Quizz'] && technicalAvailability['Technical Quizz'].isFull) { %><small class="event-full-badge">Full</small><% } %></label>
                             </div>
                             </div>
                             
                             <div class="register-section">
                             <h6 class="text-uppercase text-purple-elegant section-title fw-bold fs-7"><i class="fas fa-gamepad"></i>Select One Non-Technical Event</h6>
                             <div class="event-grid">
-                                <input type="radio" class="btn-check" name="non_technical_event" id="nontech1" value="Free Fire" required>
-                                <label class="event-tile" for="nontech1"><i class="fas fa-crosshairs mb-2"></i><span>Free Fire</span></label>
+                                <input type="radio" class="btn-check" name="non_technical_event" id="nontech1" value="Free Fire" <%= (nonTechnicalAvailability['Free Fire'] && nonTechnicalAvailability['Free Fire'].isFull) ? 'disabled' : '' %> required>
+                                <label class="event-tile" for="nontech1"><i class="fas fa-crosshairs mb-2"></i><span>Free Fire</span><% if (nonTechnicalAvailability['Free Fire'] && nonTechnicalAvailability['Free Fire'].isFull) { %><small class="event-full-badge">Full</small><% } %></label>
                                 
-                                <input type="radio" class="btn-check" name="non_technical_event" id="nontech2" value="Treasure Hunt">
-                                <label class="event-tile" for="nontech2"><i class="fas fa-map-marked mb-2"></i><span>Treasure Hunt</span></label>
+                                <input type="radio" class="btn-check" name="non_technical_event" id="nontech2" value="Treasure Hunt" <%= (nonTechnicalAvailability['Treasure Hunt'] && nonTechnicalAvailability['Treasure Hunt'].isFull) ? 'disabled' : '' %>>
+                                <label class="event-tile" for="nontech2"><i class="fas fa-map-marked mb-2"></i><span>Treasure Hunt</span><% if (nonTechnicalAvailability['Treasure Hunt'] && nonTechnicalAvailability['Treasure Hunt'].isFull) { %><small class="event-full-badge">Full</small><% } %></label>
                                 
-                                <input type="radio" class="btn-check" name="non_technical_event" id="nontech3" value="Connections">
-                                <label class="event-tile" for="nontech3"><i class="fas fa-link mb-2"></i><span>Connections</span></label>
+                                <input type="radio" class="btn-check" name="non_technical_event" id="nontech3" value="Connections" <%= (nonTechnicalAvailability['Connections'] && nonTechnicalAvailability['Connections'].isFull) ? 'disabled' : '' %>>
+                                <label class="event-tile" for="nontech3"><i class="fas fa-link mb-2"></i><span>Connections</span><% if (nonTechnicalAvailability['Connections'] && nonTechnicalAvailability['Connections'].isFull) { %><small class="event-full-badge">Full</small><% } %></label>
                             </div>
                             </div>
                             
@@ -289,8 +330,12 @@
                             <div class="card payment-card mb-0">
                                 <div class="card-body text-center">
                                     <p class="text-white small mb-3">Pay using UPI</p>
-                                    <p class="upi-pill mb-2"><strong>UPI Number:</strong> 8825676740</p>
-                                    <p class="text-white-50 small mb-3"><strong>UPI ID:</strong> 8825676740@cnrb</p>
+                                    <p class="text-white-50 small mb-2"><strong>Registration Fee:</strong> <span class="fee-value">200</span> per head</p>
+                                    <p class="upi-pill mb-2 d-inline-flex align-items-center gap-2">
+                                        <strong>UPI Number:</strong> <span id="upiNumberText" class="upi-number-value">9894260251</span>
+                                        <button type="button" id="copyUpiButton" class="btn btn-outline-light btn-sm upi-copy-btn" title="Copy UPI number" aria-label="Copy UPI number"><i class="fas fa-copy"></i></button>
+                                    </p>
+                                    <p class="text-white-50 small mb-3"><strong>Banking Name:</strong> <span class="banking-name-value">PRAVEENKUMAR RAJI</span></p>
                                     
                                     <div class="form-floating text-start">
                                         <input type="text" name="transaction_id" class="form-control glass-input" id="floatingTransaction" placeholder="Transaction ID" maxlength="12" required>
@@ -379,6 +424,37 @@
     }
     
     document.addEventListener("DOMContentLoaded", function() {
+        const upiNumberText = document.getElementById('upiNumberText');
+        const copyUpiButton = document.getElementById('copyUpiButton');
+
+        if (upiNumberText && copyUpiButton) {
+            copyUpiButton.addEventListener('click', async function() {
+                const upiNumber = String(upiNumberText.textContent || '').trim();
+                if (!upiNumber) return;
+
+                const originalContent = copyUpiButton.innerHTML;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(upiNumber);
+                    } else {
+                        const tempInput = document.createElement('input');
+                        tempInput.value = upiNumber;
+                        document.body.appendChild(tempInput);
+                        tempInput.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tempInput);
+                    }
+                    copyUpiButton.innerHTML = '<i class="fas fa-check"></i>';
+                } catch (err) {
+                    copyUpiButton.innerHTML = '<i class="fas fa-redo"></i>';
+                }
+
+                setTimeout(function() {
+                    copyUpiButton.innerHTML = originalContent;
+                }, 1200);
+            });
+        }
+
         const registerForm = document.getElementById('registerForm');
         if (registerForm) {
             registerForm.addEventListener('submit', function(event) {

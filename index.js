@@ -15,10 +15,20 @@ const path = require('path');
 const app = express();
 app.disable('x-powered-by');
 
-const TECH_EVENTS = ['Paper Presentation', 'Style Craft Css', 'Code War'];
+const TECH_EVENTS = ['Paper Presentation', 'Style Craft Css', 'Technical Quizz'];
+const LEGACY_TECH_EVENT_ALIASES = ['Code War'];
 const NON_TECH_EVENTS = ['Free Fire', 'Treasure Hunt', 'Connections'];
+const MAX_EVENT_CAPACITY = 50;
 const TECH_EVENTS_NORMALIZED = TECH_EVENTS.map(event => event.toLowerCase().trim());
 const NON_TECH_EVENTS_NORMALIZED = NON_TECH_EVENTS.map(event => event.toLowerCase().trim());
+const LEGACY_TECH_EVENTS_NORMALIZED = LEGACY_TECH_EVENT_ALIASES.map(event => event.toLowerCase().trim());
+const TECH_EVENT_CANONICAL_MAP = {
+    'paper presentation': 'Paper Presentation',
+    'style craft css': 'Style Craft Css',
+    'technical quizz': 'Technical Quizz',
+    'technical quiz': 'Technical Quizz',
+    'code war': 'Technical Quizz'
+};
 const MAX_LOGIN_ATTEMPTS = 5;
 const ACCOUNT_LOCK_MS = 15 * 60 * 1000;
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
@@ -32,6 +42,10 @@ const AUTH_ABUSE_WINDOW_MS = 15 * 60 * 1000;
 const AUTH_ABUSE_THRESHOLD = Number(process.env.AUTH_ABUSE_THRESHOLD || 20);
 const authAbuseTracker = new Map();
 const TRUST_PROXY = process.env.TRUST_PROXY;
+const STRICT_PROXY_VALIDATION = process.env.STRICT_PROXY_VALIDATION !== 'false';
+const BACKUP_ENCRYPTION_ENABLED = process.env.BACKUP_ENCRYPTION_ENABLED;
+const BACKUP_ACCESS_AUDIT_ENABLED = process.env.BACKUP_ACCESS_AUDIT_ENABLED;
+const BACKUP_ENCRYPTION_KEY_ID = process.env.BACKUP_ENCRYPTION_KEY_ID;
 const trustProxySetting = TRUST_PROXY === 'true'
     ? 1
     : TRUST_PROXY === 'false'
@@ -73,6 +87,48 @@ function validateSecurityConfig() {
 
     if (FORCE_HTTPS && !trustProxySetting) {
         console.warn('⚠️ FORCE_HTTPS is enabled while trust proxy is disabled. If behind a reverse proxy, set TRUST_PROXY=true.');
+    }
+
+    if (isProduction && SESSION_STORE !== 'mongo') {
+        const message = 'SESSION_STORE must be set to "mongo" in production.';
+        console.error(`❌ ${message}`);
+        throw new Error(message);
+    }
+
+    if (isProduction && STRICT_PROXY_VALIDATION) {
+        if (!['true', 'false'].includes(String(TRUST_PROXY))) {
+            const message = 'TRUST_PROXY must be explicitly set to "true" or "false" in production.';
+            console.error(`❌ ${message}`);
+            throw new Error(message);
+        }
+
+        if (FORCE_HTTPS && trustProxySetting !== 1) {
+            const message = 'FORCE_HTTPS in production requires TRUST_PROXY=true when behind a reverse proxy.';
+            console.error(`❌ ${message}`);
+            throw new Error(message);
+        }
+    }
+
+    if (isProduction) {
+        const backupControlsMissing = [];
+
+        if (BACKUP_ENCRYPTION_ENABLED !== 'true') {
+            backupControlsMissing.push('BACKUP_ENCRYPTION_ENABLED=true');
+        }
+
+        if (BACKUP_ACCESS_AUDIT_ENABLED !== 'true') {
+            backupControlsMissing.push('BACKUP_ACCESS_AUDIT_ENABLED=true');
+        }
+
+        if (!BACKUP_ENCRYPTION_KEY_ID || !String(BACKUP_ENCRYPTION_KEY_ID).trim()) {
+            backupControlsMissing.push('BACKUP_ENCRYPTION_KEY_ID');
+        }
+
+        if (backupControlsMissing.length > 0) {
+            const message = `Backup security controls are incomplete: ${backupControlsMissing.join(', ')}.`;
+            console.error(`❌ ${message}`);
+            throw new Error(message);
+        }
     }
 }
 
@@ -129,6 +185,35 @@ app.use(helmet({
         },
     },
 }));
+
+const REQUIRED_SECURITY_HEADERS = [
+    'content-security-policy',
+    'strict-transport-security',
+    'x-content-type-options',
+    'x-frame-options',
+    'referrer-policy'
+];
+
+app.use((req, res, next) => {
+    res.on('finish', () => {
+        const missingHeaders = REQUIRED_SECURITY_HEADERS.filter((headerName) => {
+            const value = res.getHeader(headerName);
+            return !(typeof value === 'string' ? value.trim().length > 0 : Boolean(value));
+        });
+
+        if (missingHeaders.length === 0) return;
+
+        const message = `Missing security headers on ${req.method} ${req.originalUrl}: ${missingHeaders.join(', ')}`;
+        if (process.env.NODE_ENV === 'production') {
+            console.error(`❌ ${message}`);
+            return;
+        }
+
+        console.warn(`⚠️ ${message}`);
+    });
+
+    next();
+});
 
 app.use(bodyParser.urlencoded({ extended: false, limit: '10kb' }));
 app.use('/vendor/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
@@ -408,6 +493,11 @@ function hashSensitiveValue(value) {
     return crypto.createHash('sha256').update(String(value).trim()).digest('hex');
 }
 
+function getCanonicalTechnicalEvent(value) {
+    const normalizedValue = String(value || '').toLowerCase().trim();
+    return TECH_EVENT_CANONICAL_MAP[normalizedValue] || null;
+}
+
 function getClientIp(req) {
     return req.ip || req.socket?.remoteAddress || 'unknown';
 }
@@ -432,6 +522,52 @@ async function logAuditEvent({ eventType, outcome, req, userId = null, email = n
     } catch (err) {
         console.error('Audit log write failed:', err.message);
     }
+}
+
+async function getEventAvailability() {
+    const technical = Object.fromEntries(TECH_EVENTS.map(event => [event, { count: 0, isFull: false }]));
+    const nonTechnical = Object.fromEntries(NON_TECH_EVENTS.map(event => [event, { count: 0, isFull: false }]));
+
+    const [technicalCounts, nonTechnicalCounts] = await Promise.all([
+        User.aggregate([
+            { $match: { technical_event: { $in: TECH_EVENTS } } },
+            { $group: { _id: '$technical_event', count: { $sum: 1 } } }
+        ]),
+        User.aggregate([
+            { $match: { non_technical_event: { $in: NON_TECH_EVENTS } } },
+            { $group: { _id: '$non_technical_event', count: { $sum: 1 } } }
+        ])
+    ]);
+
+    technicalCounts.forEach(item => {
+        if (!technical[item._id]) return;
+        technical[item._id] = {
+            count: item.count,
+            isFull: item.count >= MAX_EVENT_CAPACITY
+        };
+    });
+
+    nonTechnicalCounts.forEach(item => {
+        if (!nonTechnical[item._id]) return;
+        nonTechnical[item._id] = {
+            count: item.count,
+            isFull: item.count >= MAX_EVENT_CAPACITY
+        };
+    });
+
+    return { technical, nonTechnical };
+}
+
+async function renderRegisterPage(req, res, { user, error = null }) {
+    const eventAvailability = await getEventAvailability();
+
+    return res.render('register', {
+        error,
+        csrfToken: getCsrfToken(req),
+        user,
+        eventAvailability,
+        maxEventCapacity: MAX_EVENT_CAPACITY
+    });
 }
 
 function recordAuthFailureAndMaybeAlert(req, reason) {
@@ -796,20 +932,17 @@ app.get('/register', isAuth, async (req, res) => {
 
     const error = typeof req.query.error === 'string' ? req.query.error : null;
 
-    res.render('register', {
-        error,
-        csrfToken: getCsrfToken(req),
-        user: user
-    });
+    return renderRegisterPage(req, res, { error, user });
 });
 
 // 🛡️ UPDATED REGISTER LOGIC: DUPLICATE CHECK ADDED
 app.post('/register', 
     registerLimiter,
     body('college').trim().isLength({ min: 2, max: 120 }).withMessage('Enter a valid college name.').escape(),
-    body('technical_event').trim().custom((value) => {
-        return TECH_EVENTS_NORMALIZED.includes(String(value || '').toLowerCase().trim());
-    }).withMessage('Select a valid technical event.'),
+    body('technical_event')
+        .customSanitizer((value) => getCanonicalTechnicalEvent(value) || String(value || '').trim())
+        .custom((value) => TECH_EVENTS.includes(String(value || '').trim()))
+        .withMessage('Select a valid technical event.'),
     body('non_technical_event').trim().custom((value) => {
         return NON_TECH_EVENTS_NORMALIZED.includes(String(value || '').toLowerCase().trim());
     }).withMessage('Select a valid non-technical event.'),
@@ -831,15 +964,52 @@ app.post('/register',
                     req,
                     userId: req.session.userId
                 });
-                return res.render('register', {
+                return renderRegisterPage(req, res, {
                     error: validationMessage,
-                    csrfToken: getCsrfToken(req),
-                    user: user
+                    user
                 });
             }
 
             const currentUser = await User.findById(req.session.userId);
             if (!currentUser) return res.redirect('/');
+
+            const eventAvailability = await getEventAvailability();
+            const rawSelectedTechnicalEvent = String(req.body.technical_event || '').trim();
+            const selectedTechnicalEvent = getCanonicalTechnicalEvent(rawSelectedTechnicalEvent) || rawSelectedTechnicalEvent;
+            const selectedNonTechnicalEvent = String(req.body.non_technical_event || '').trim();
+
+            const capacityErrors = [];
+            const technicalStatus = eventAvailability.technical[selectedTechnicalEvent];
+            const nonTechnicalStatus = eventAvailability.nonTechnical[selectedNonTechnicalEvent];
+            const technicalChanged = currentUser.technical_event !== selectedTechnicalEvent;
+            const nonTechnicalChanged = currentUser.non_technical_event !== selectedNonTechnicalEvent;
+
+            if (technicalStatus && technicalStatus.isFull && technicalChanged) {
+                capacityErrors.push(`${selectedTechnicalEvent} is full. Please choose another technical event.`);
+            }
+
+            if (nonTechnicalStatus && nonTechnicalStatus.isFull && nonTechnicalChanged) {
+                capacityErrors.push(`${selectedNonTechnicalEvent} is full. Please choose another non-technical event.`);
+            }
+
+            if (capacityErrors.length > 0) {
+                await logAuditEvent({
+                    eventType: 'registration',
+                    outcome: 'capacity_full',
+                    req,
+                    userId: currentUser._id,
+                    email: currentUser.email,
+                    metadata: {
+                        technical_event: selectedTechnicalEvent,
+                        non_technical_event: selectedNonTechnicalEvent
+                    }
+                });
+
+                return renderRegisterPage(req, res, {
+                    error: capacityErrors.join(' | '),
+                    user: currentUser
+                });
+            }
 
             // 1. DUPLICATE CHECK
             // Check if Transaction ID matches any OTHER user (exclude current user)
@@ -860,10 +1030,9 @@ app.post('/register',
                     email: currentUser.email
                 });
                 // Return to register page with error
-                return res.render('register', {
+                return renderRegisterPage(req, res, {
                     error: "⚠️ Transaction ID is already used by another participant.",
-                    csrfToken: getCsrfToken(req),
-                    user: currentUser // Keep form pre-filled
+                    user: currentUser
                 });
             }
 
@@ -886,7 +1055,7 @@ app.post('/register',
 
             // 3. Update User
             currentUser.college = req.body.college;
-            currentUser.technical_event = req.body.technical_event;
+            currentUser.technical_event = selectedTechnicalEvent;
             currentUser.non_technical_event = req.body.non_technical_event;
             currentUser.transaction_id_hash = hashSensitiveValue(req.body.transaction_id);
             currentUser.transaction_id_last4 = req.body.transaction_id.slice(-4);
@@ -922,10 +1091,9 @@ app.post('/register',
             });
             // Fallback for unexpected errors
             const user = await User.findById(req.session.userId);
-            res.render('register', {
+            return renderRegisterPage(req, res, {
                 error: "System error. Please verify input and try again.",
-                csrfToken: getCsrfToken(req),
-                user: user
+                user
             });
         }
     }
