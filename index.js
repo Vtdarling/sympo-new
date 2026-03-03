@@ -43,6 +43,7 @@ const AUTH_ABUSE_THRESHOLD = Number(process.env.AUTH_ABUSE_THRESHOLD || 20);
 const authAbuseTracker = new Map();
 const TRUST_PROXY = process.env.TRUST_PROXY;
 const STRICT_PROXY_VALIDATION = process.env.STRICT_PROXY_VALIDATION !== 'false';
+const HARD_FAIL_SECURITY_CONFIG = process.env.HARD_FAIL_SECURITY_CONFIG === 'true';
 const BACKUP_ENCRYPTION_ENABLED = process.env.BACKUP_ENCRYPTION_ENABLED;
 const BACKUP_ACCESS_AUDIT_ENABLED = process.env.BACKUP_ACCESS_AUDIT_ENABLED;
 const BACKUP_ENCRYPTION_KEY_ID = process.env.BACKUP_ENCRYPTION_KEY_ID;
@@ -58,6 +59,14 @@ app.set('trust proxy', trustProxySetting);
 function validateSecurityConfig() {
     const isProduction = process.env.NODE_ENV === 'production';
     const missingVars = [];
+
+    function reportHardeningIssue(message) {
+        if (isProduction && HARD_FAIL_SECURITY_CONFIG) {
+            console.error(`❌ ${message}`);
+            throw new Error(message);
+        }
+        console.warn(`⚠️ ${message}`);
+    }
 
     if (!process.env.MONGO_URI) {
         missingVars.push('MONGO_URI');
@@ -91,21 +100,18 @@ function validateSecurityConfig() {
 
     if (isProduction && SESSION_STORE !== 'mongo') {
         const message = 'SESSION_STORE must be set to "mongo" in production.';
-        console.error(`❌ ${message}`);
-        throw new Error(message);
+        reportHardeningIssue(message);
     }
 
     if (isProduction && STRICT_PROXY_VALIDATION) {
         if (!['true', 'false'].includes(String(TRUST_PROXY))) {
             const message = 'TRUST_PROXY must be explicitly set to "true" or "false" in production.';
-            console.error(`❌ ${message}`);
-            throw new Error(message);
+            reportHardeningIssue(message);
         }
 
         if (FORCE_HTTPS && trustProxySetting !== 1) {
             const message = 'FORCE_HTTPS in production requires TRUST_PROXY=true when behind a reverse proxy.';
-            console.error(`❌ ${message}`);
-            throw new Error(message);
+            reportHardeningIssue(message);
         }
     }
 
@@ -126,8 +132,7 @@ function validateSecurityConfig() {
 
         if (backupControlsMissing.length > 0) {
             const message = `Backup security controls are incomplete: ${backupControlsMissing.join(', ')}.`;
-            console.error(`❌ ${message}`);
-            throw new Error(message);
+            reportHardeningIssue(message);
         }
     }
 }
