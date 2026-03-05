@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TECQUORA 2k26 | Landing</title>
+    
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/aos/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <style nonce="<%= cspNonce %>">
+        .home-body { background-color: #0f0c29; color: white; }
+        .divider-line { width: 60px; height: 3px; }
+        .footer-dark { background: #050508; color: #888; }
+        .hero-intro-colorful {
+            color: #ffffff;
+            text-shadow: 2px 2px #ff00de, -2px -2px #00d2ff;
+        }
+        .spot-registration-note {
+            font-size: clamp(1.1rem, 2.3vw, 1.65rem);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 14px rgba(255, 193, 7, 0.35);
+        }
+        .home-fee-note {
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .home-fee-value {
+            color: #ffd95e;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body class="home-body">
+
+    <nav class="navbar navbar-expand-lg fixed-top glass-nav py-2">
+        <div class="container-fluid px-3 d-flex align-items-center">
+            
+            <a class="navbar-brand fw-bold text-white fs-4" href="#">
+                <i class="fas fa-microchip text-info me-2"></i>TECQUORA
+            </a>
+            
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#hero">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#events">Events</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#schedule">Schedule</a></li>
+                    <li class="nav-item my-2 my-lg-0">
+                        <a id="nav-cta-btn" class="btn btn-glow ms-lg-3" href="/login">Online Registration</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header id="hero" class="hero-section text-center text-white">
+        <div class="container-fluid px-3">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <h5 class="text-uppercase letter-spacing-1 mb-3 fw-bold fs-2 hero-intro-colorful">Department of IT Presents</h5>
+                    <h1 class="glitch-text mb-4 fw-bold display-2">TECQUORA 2k26</h1>
+                    <p class="mb-5 text-white-50 fw-bold fs-3">Join the ultimate convergence of code, creativity, and innovation.</p>
+                    
+                    <div class="d-flex flex-column-reverse flex-sm-row justify-content-center align-items-center gap-3">
+                        <a href="#about" class="btn btn-outline-light rounded-pill px-4 py-2">Learn More</a>
+                        <a id="hero-cta-btn" href="/login" class="btn btn-glow">Online Registration</a>
+                    </div>
+
+                    <p class="mt-3 mb-0 text-warning spot-registration-note">Spot Registration Also Available</p>
+                    <p class="mt-2 mb-0 home-fee-note">Registration Fee: <span class="home-fee-value">₹200</span> per head</p>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="about" class="about-section py-5 position-relative">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <div class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill fw-bold fs-6">13/03/2026</div>
+                    <h2 class="display-5 fw-bold mb-4">Where Innovation <br> Meets <span class="text-info">Intelligence</span></h2>
+                    <p class="text-white-50 lead mb-4">
+                        TECQUORA 2k26 is a national-level technical fest. Compete with the best minds and win cash prizes worth <strong>₹50,000</strong>.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
+                        <a href="/login" class="btn btn-outline-info rounded-pill px-4 py-2 fw-bold">Online Registration</a>
+                        <a href="/coordinators" class="btn btn-outline-warning rounded-pill px-4 py-2 fw-bold">Coordinators</a>
+                    </div>
+                    <div class="row g-4 mt-2">
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-square bg-dark border border-secondary rounded-3 p-3 me-3">
+                                    <i class="fas fa-trophy text-warning fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-white">Cash Prizes</h6>
+                                    <small class="text-white-50">Win Big Rewards</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-square bg-dark border border-secondary rounded-3 p-3 me-3">
+                                    <i class="fas fa-certificate text-info fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-white">Certificates</h6>
+                                    <small class="text-white-50">For all Participants</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                  <img id="aboutImage" src="/images/about.jpeg" alt="Abouting" class="img-fluid rounded-4 shadow-lg border border-secondary" data-fallback="https://via.placeholder.com/600x400?text=TECQUORA+2k26">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="events" class="event-section py-5">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold display-5">Our Events</h2>
+                <div class="divider bg-info mx-auto mb-3 divider-line"></div>
+                <p class="text-white-50">Technical & Non-Technical Challenges</p>
+            </div>
+
+            <h3 class="text-info mb-4"><i class="fas fa-microchip me-2"></i> Technical Events</h3>
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-file-powerpoint fa-3x card-icon text-primary"></i>
+                        <h4>Paper Presentation</h4>
+                        <p class="text-white-50 small">Present your innovative ideas with impactful slides.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-palette fa-3x card-icon text-danger"></i>
+                        <h4>Style Craft Css</h4>
+                        <p class="text-white-50 small">Build stylish UI challenges using modern CSS skills.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-laptop-code fa-3x card-icon text-success"></i>
+                        <h4>Technical Quizz</h4>
+                        <p class="text-white-50 small">Test your knowledge in rapid quiz rounds and answer against time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-warning mb-4"><i class="fas fa-gamepad me-2"></i> Non-Technical Events</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-crosshairs fa-3x card-icon text-warning"></i>
+                        <h4>Free Fire</h4>
+                        <p class="text-white-50 small">Battle with squads and prove your survival strategy.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-map-marked-alt fa-3x card-icon text-warning"></i>
+                        <h4>Treasure Hunt</h4>
+                        <p class="text-white-50 small">Solve riddles and find hidden QR codes.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="custom-card text-center">
+                        <i class="fas fa-link fa-3x card-icon text-warning"></i>
+                        <h4>Connections</h4>
+                        <p class="text-white-50 small">Connect clues fast and solve the ultimate chain puzzle.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a id="bottom-cta-btn" href="/login" class="btn btn-glow px-5 py-3 fs-5">Online Registration</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="schedule" class="event-section py-5">
+        <div class="container coordinator-wrap schedule-wrap py-2">
+            <div class="coordinator-header d-flex justify-content-between align-items-center mb-4">
+                <h2 class="hero-title fw-bold mb-0">Event Schedule</h2>
+            </div>
+
+            <p class="schedule-date mb-4">Event Date: <strong class="text-white">13/03/2026</strong></p>
+
+            <div class="coordinator-card schedule-card p-3 p-md-4">
+                <div class="table-responsive">
+                    <table class="table schedule-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">Time</th>
+                                <th scope="col">Program</th>
+                                <th scope="col">Venue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>09:00 AM onwards</td>
+                                <td>Registration Desk Open</td>
+                                <td>Ganga Hall</td>
+                            </tr>
+                            <tr>
+                                <td>09:30 AM - 10:40 AM</td>
+                                <td>Inauguration</td>
+                                <td>Ganga Hall</td>
+                            </tr>
+                            <tr>
+                                <td>11:00 AM - 01:00 PM</td>
+                                <td>Paper Presentation 1</td>
+                                <td>Room : M110</td>
+                            </tr>
+                            <tr>
+                                <td>11:00 AM - 01:00 PM</td>
+                                <td>Paper Presentation 2</td>
+                                <td>Room : 210</td>
+                            </tr>
+                            <tr>
+                                <td>11:00 AM - 01:00 PM</td>
+                                <td>Style Craft Css</td>
+                                <td>IT Labs</td>
+                            </tr>
+                            <tr>
+                                <td>11:00 AM - 01:00 PM</td>
+                                <td>Technical Quizz</td>
+                                <td>IT Labs</td>
+                            </tr>
+                            <tr>
+                                <td>01:00 PM - 02:00 PM</td>
+                                <td>Lunch Break</td>
+                                <td>Dining Hall</td>
+                            </tr>
+                            <tr>
+                                <td>02:00 PM - 04:00 PM</td>
+                                <td>Free Fire</td>
+                                <td>IT Labs</td>
+                            </tr>
+                            <tr>
+                                <td>02:00 PM - 04:00 PM</td>
+                                <td>Connections</td>
+                                <td>IT Labs</td>
+                            </tr>
+                            <tr>
+                                <td>02:00 PM - 04:00 PM</td>
+                                <td>Treasure Hunt</td>
+                                <td>Campus Area</td>
+                            </tr>
+                            <tr>
+                                <td>04:15 PM - 05:00 PM</td>
+                                <td>Finals &amp; Valediction</td>
+                                <td>Ganga Hall</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center py-4 footer-dark">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 Department of Information Technology. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/aos/aos.js"></script>
+    <script nonce="<%= cspNonce %>"> 
+        try {
+            AOS.init(); 
+        } catch(e) {
+            console.warn("AOS Animation failed to load");
+        }
+    </script>
+
+    <script nonce="<%= cspNonce %>">
+        const aboutImage = document.getElementById('aboutImage');
+        if (aboutImage) {
+            aboutImage.addEventListener('error', function() {
+                this.src = this.getAttribute('data-fallback');
+            }, { once: true });
+        }
+    </script>
+</body>
+</html>

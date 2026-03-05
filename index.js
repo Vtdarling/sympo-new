@@ -311,7 +311,7 @@ app.use((req, res, next) => {
     if ((now - req.session.createdAt) > ABSOLUTE_SESSION_MS) {
         return req.session.destroy(() => {
             res.clearCookie('symposium.sid');
-            res.redirect('/?error=Session expired. Please login again.');
+            res.redirect('/login?error=Session expired. Please login again.');
         });
     }
 
@@ -387,15 +387,28 @@ function verifyCsrf(req, res, next) {
 
     const validTokens = Array.isArray(req.session.csrfTokens) ? req.session.csrfTokens : [];
     const requestToken = req.body && req.body._csrf;
-    const invalidLoginRedirect = '/?error=Invalid credentials';
+    const csrfFailureRedirect = (() => {
+        switch (req.path) {
+            case '/login':
+                return '/login?error=Invalid credentials';
+            case '/signup':
+                return '/signup?error=Session expired. Please refresh and try again.';
+            case '/register':
+                return '/register?error=Session expired. Please refresh and try again.';
+            case '/logout':
+                return '/login?error=Session expired. Please login again.';
+            default:
+                return '/login?error=Session expired. Please refresh and try again.';
+        }
+    })();
 
     if (!requestToken) {
-        return res.redirect(invalidLoginRedirect);
+        return res.redirect(csrfFailureRedirect);
     }
 
     const tokenIndex = validTokens.indexOf(requestToken);
     if (tokenIndex === -1) {
-        return res.redirect(invalidLoginRedirect);
+        return res.redirect(csrfFailureRedirect);
     }
 
     validTokens.splice(tokenIndex, 1);
@@ -466,12 +479,12 @@ const AuditLog = mongoose.model('AuditLog', auditLogSchema);
 /* ---------------- HELPERS ---------------- */
 function isAuth(req, res, next) {
     if (!req.session.userId) {
-        return res.redirect('/?error=Please login');
+        return res.redirect('/login?error=Please login');
     }
     next();
 }
 
-app.use(['/home', '/register', '/confirmation', '/logout', '/schedule', '/coordinators'], isAuth);
+app.use(['/home', '/register', '/confirmation', '/logout', '/schedule'], isAuth);
 
 async function registerFailedLogin(user) {
     if (!user) return;
@@ -655,8 +668,13 @@ setTimeout(() => {
 
 /* ---------------- ROUTES ---------------- */
 
-// LOGIN PAGE
+// LANDING PAGE
 app.get('/', (req, res) => {
+    res.render('landing');
+});
+
+// LOGIN PAGE
+app.get('/login', (req, res) => {
     const signupSuccessMsg = 'Account created! Please login to complete registration.';
     let error = req.query.error || null;
     let success = req.query.success || null;
@@ -680,8 +698,8 @@ app.post(
     body('email').isEmail().normalizeEmail(),
     body('phone').trim().isNumeric().isLength({ min: 10, max: 10 }),
     async (req, res) => {
-        const genericAuthError = '/?error=Invalid credentials';
-        const accountNotFoundError = '/?error=Account not found. Please register first.';
+        const genericAuthError = '/login?error=Invalid credentials';
+        const accountNotFoundError = '/login?error=Account not found. Please register first.';
         const requestEmail = req.body && req.body.email ? req.body.email : null;
 
         if (!validationResult(req).isEmpty()) {
@@ -760,7 +778,7 @@ app.post(
             req.session.regenerate((sessionErr) => {
                 if (sessionErr) {
                     console.error('Session regenerate error:', sessionErr);
-                    return res.redirect('/?error=Server error');
+                    return res.redirect('/login?error=Server error');
                 }
 
                 req.session.userId = loggedInUserId;
@@ -775,7 +793,7 @@ app.post(
                             userId: loggedInUserId,
                             email
                         });
-                        return res.redirect('/?error=Server error');
+                        return res.redirect('/login?error=Server error');
                     }
 
                     logAuditEvent({
@@ -798,15 +816,17 @@ app.post(
                 email: requestEmail,
                 metadata: { message: err.message }
             });
-            res.redirect('/?error=Server error');
+            res.redirect('/login?error=Server error');
         }
     }
 );
 
 // SIGNUP PAGE
 app.get('/signup', (req, res) => {
+    const error = typeof req.query.error === 'string' ? req.query.error : null;
+
     res.render('signup', {
-        error: null,
+        error,
         csrfToken: getCsrfToken(req)
     });
 });
@@ -866,7 +886,7 @@ app.post('/signup',
                 metadata: { consentVersion: CONSENT_VERSION }
             });
 
-            res.redirect('/?success=Account created! Please login to complete registration.');
+            res.redirect('/login?success=Account created! Please login to complete registration.');
 
         } catch (err) {
             console.error("Signup Error:", err); 
@@ -892,7 +912,7 @@ app.get('/home', isAuth, async (req, res) => {
         const user = await User.findById(req.session.userId);
         if (!user) {
             req.session.destroy();
-            return res.redirect('/');
+            return res.redirect('/login');
         }
 
         const isFullyRegistered = user.event_id && !user.event_id.startsWith('TEMP_');
@@ -906,7 +926,7 @@ app.get('/home', isAuth, async (req, res) => {
     } catch (err) {
         console.error(err);
         req.session.destroy();
-        res.redirect('/');
+        res.redirect('/login');
     }
 });
 
@@ -920,7 +940,7 @@ app.get('/schedule', isAuth, (req, res) => {
 });
 
 // COORDINATORS PAGE
-app.get('/coordinators', isAuth, (req, res) => {
+app.get('/coordinators', (req, res) => {
     if (Object.keys(req.query || {}).length > 0) {
         return res.redirect('/coordinators');
     }
@@ -976,7 +996,7 @@ app.post('/register',
             }
 
             const currentUser = await User.findById(req.session.userId);
-            if (!currentUser) return res.redirect('/');
+            if (!currentUser) return res.redirect('/login');
 
             const eventAvailability = await getEventAvailability();
             const rawSelectedTechnicalEvent = String(req.body.technical_event || '').trim();
@@ -1112,7 +1132,7 @@ app.get('/confirmation', isAuth, async (req, res) => {
 
     try {
         const user = await User.findById(req.session.userId).select('+transaction_id +transaction_id_last4');
-        if (!user) return res.redirect('/');
+        if (!user) return res.redirect('/login');
         res.render('confirmation', { user });
     } catch (err) {
         res.redirect('/home');
